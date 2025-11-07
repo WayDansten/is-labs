@@ -40,7 +40,7 @@ public class LabWorkController {
 
     @POST
     public Response add(LabWorkRequestDTO dto) {
-        service.create(dto);
+        service.add(dto);
         return Response.status(Response.Status.CREATED).entity(new StringResponseDTO(MessageConstants.OK.getMessage()))
                 .build();
     }
@@ -54,7 +54,7 @@ public class LabWorkController {
     @PATCH
     @Path("/difficulty")
     public Response lowerDifficulty(DifficultyRequestDTO dto) {
-        service.lowerDifficulty(dto.getId(), dto.getSteps());
+        service.lowerDifficulty(dto);
         return Response.ok(new StringResponseDTO(MessageConstants.OK.getMessage())).build();
     }
 

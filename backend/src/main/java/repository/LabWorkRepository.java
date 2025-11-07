@@ -18,24 +18,6 @@ public class LabWorkRepository extends AbstractRepository<LabWork, Integer> {
         super(LabWork.class);
     }
 
-    public List<LabWork> findGreaterThanAveragePoint(float averagePoint) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<LabWork> cq = cb.createQuery(LabWork.class);
-        Root<LabWork> root = cq.from(LabWork.class);
-
-        cq.where(cb.greaterThan(root.get("averagePoint"), averagePoint));
-        return em.createQuery(cq).getResultList();
-    }
-
-    public List<LabWork> findDescriptionThanStartsWith(String prefix) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<LabWork> cq = cb.createQuery(LabWork.class);
-        Root<LabWork> root = cq.from(LabWork.class);
-
-        cq.where(cb.like(root.get("description"), prefix + "%"));
-        return em.createQuery(cq).getResultList();
-    }
-
     public List<LabWork> getByAuthor(String author) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<LabWork> cq = cb.createQuery(LabWork.class);

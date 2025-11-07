@@ -7,9 +7,10 @@ import java.util.Set;
 
 import dto.labwork.LabWorkRequestDTO;
 import dto.labwork.LabWorkResponseDTO;
+import dto.misc.DifficultyRequestDTO;
 import entity.LabWork;
 import entity.types.Difficulty;
-import events.EventPublisher;
+import event.EventPublisher;
 import exception.DifficultyException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -37,10 +38,10 @@ public class LabWorkService {
     }
 
     @Transactional
-    public void create(LabWorkRequestDTO dto) {
+    public void add(LabWorkRequestDTO dto) {
         Set<WebSocketMessageType> changedTypes = trackerService.trackChanges(dto);
         LabWork entity = mapper.toEntity(dto);
-        repository.save(entity);
+        repository.add(entity);
         eventPublisher.fireEvent(changedTypes);
     }
 
@@ -53,7 +54,9 @@ public class LabWorkService {
     }
 
     @Transactional
-    public void lowerDifficulty(Integer id, Integer steps) {
+    public void lowerDifficulty(DifficultyRequestDTO dto) {
+        Integer id = dto.getId();
+        Integer steps = dto.getSteps();
         Set<WebSocketMessageType> changedTypes = new HashSet<>();
         changedTypes.add(WebSocketMessageType.LABWORK);
         LabWork entity = repository.getByKey(id).orElseThrow(() -> new EntityNotFoundException());

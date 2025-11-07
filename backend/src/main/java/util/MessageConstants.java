@@ -10,7 +10,8 @@ public enum MessageConstants {
     
     ERR_BAD_REQUEST("Failed to fulfill the request: field constraints violated."),
     ERR_NOT_FOUND("Failed to fulfill the request: entity not found."),
-    ERR_PERSISTENCE("Failed to fulfill the request: names for Disciplines, People and Locations need to be unique.");
+    ERR_PERSISTENCE("Failed to fulfill the request: names for Disciplines, People and Locations need to be unique."),
+    ERR_DIFFICULTY("Failed to fulfill the request: difficulty cannot be lowered below minimum");
 
     private String message;
 }

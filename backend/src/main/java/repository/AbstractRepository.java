@@ -22,8 +22,12 @@ public abstract class AbstractRepository<T, K> {
         this.entityClass = entityClass;
     }
 
-    public void save(T entity) {
+    public void add(T entity) {
         em.merge(entity);
+    }
+
+    public void delete(T entity) {
+        em.remove(entity);
     }
 
     public List<T> getAll() {
@@ -37,10 +41,6 @@ public abstract class AbstractRepository<T, K> {
 
     public void update(T entity) {
         em.merge(entity);
-    }
-
-    public void delete(T entity) {
-        em.remove(entity);
     }
 
     public Optional<T> getByKey(K key) {
