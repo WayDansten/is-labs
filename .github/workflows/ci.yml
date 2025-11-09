@@ -21,12 +21,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'gradle'
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
       - name: Build backend
-        run: ./gradlew :web:war
+        run: gradle :web:war
       - name: Checkstyle check
-        run: ./gradlew checkstyleMain
+        run: gradle checkstyleMain
 
   frontend:
     name: Build & Lint Frontend
