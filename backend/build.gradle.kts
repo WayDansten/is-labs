@@ -29,7 +29,7 @@ allprojects {
     }
 
     checkstyle {
-        config = resources.text.fromFile("checkstyle.xml")
+        config = resources.text.fromFile(rootProject.file("checkstyle.xml"))
         isShowViolations = true
         isIgnoreFailures = false
     }

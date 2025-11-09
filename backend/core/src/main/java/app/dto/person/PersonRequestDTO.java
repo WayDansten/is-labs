@@ -10,8 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import app.entity.types.Color;
-import app.entity.types.Country;
+import app.types.Color;
+import app.types.Country;
 
 @Getter
 @Setter

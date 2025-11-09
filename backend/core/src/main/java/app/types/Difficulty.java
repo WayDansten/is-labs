@@ -1,4 +1,4 @@
-package app.entity.types;
+package app.types;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

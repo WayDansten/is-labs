@@ -2,6 +2,7 @@ package app.entity;
 
 import java.time.LocalDateTime;
 
+import app.types.Difficulty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +19,6 @@ import jakarta.validation.constraints.DecimalMin;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import app.entity.types.Difficulty;
 
 @Getter
 @Setter

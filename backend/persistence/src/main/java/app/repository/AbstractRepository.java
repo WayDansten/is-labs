@@ -1,4 +1,4 @@
-package lab1.repository;
+package app.repository;
 
 import java.util.List;
 import java.util.Optional;

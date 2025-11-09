@@ -17,8 +17,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.NoArgsConstructor;
 import app.entity.LabWork;
-import app.entity.types.Difficulty;
 import app.repository.LabWorkRepository;
+import app.types.Difficulty;
 import app.websocket.WebSocketMessageType;
 
 @ApplicationScoped

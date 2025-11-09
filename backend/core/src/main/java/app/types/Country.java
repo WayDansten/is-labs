@@ -1,4 +1,4 @@
-package app.entity.types;
+package app.types;
 
 public enum Country {
     UNITED_KINGDOM,

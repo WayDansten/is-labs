@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import app.entity.types.Difficulty;
+import app.types.Difficulty;
 
 @Getter
 @Setter
