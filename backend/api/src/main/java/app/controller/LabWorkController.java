@@ -1,0 +1,101 @@
+package app.controller;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import app.util.MessageConstants;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import app.dto.labwork.LabWorkRequestDTO;
+import app.dto.labwork.LabWorkResponseDTO;
+import app.dto.misc.DifficultyRequestDTO;
+import app.dto.misc.LongResponseDTO;
+import app.dto.misc.StringRequestDTO;
+import app.dto.misc.StringResponseDTO;
+import jakarta.inject.Inject;
+import app.service.LabWorkService;
+
+@Path("/labwork")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public class LabWorkController {
+    private LabWorkService service;
+
+    public LabWorkController() {
+    }
+
+    @Inject
+    public LabWorkController(LabWorkService service) {
+        this.service = service;
+    }
+
+    @POST
+    public Response add(LabWorkRequestDTO dto) {
+        service.add(dto);
+        return Response.status(Response.Status.CREATED).entity(new StringResponseDTO(MessageConstants.OK.getMessage()))
+                .build();
+    }
+
+    @PATCH
+    public Response update(LabWorkRequestDTO dto) {
+        service.update(dto);
+        return Response.ok(new StringResponseDTO(MessageConstants.OK.getMessage())).build();
+    }
+
+    @PATCH
+    @Path("/difficulty")
+    public Response lowerDifficulty(DifficultyRequestDTO dto) {
+        service.lowerDifficulty(dto);
+        return Response.ok(new StringResponseDTO(MessageConstants.OK.getMessage())).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Integer id) {
+        service.delete(id);
+        return Response.ok(new StringResponseDTO(MessageConstants.OK.getMessage())).build();
+    }
+
+    @DELETE
+    @Path("/author")
+    public Response deleteByAuthor(StringRequestDTO dto) {
+        service.deleteByAuthor(dto.getString());
+        return Response.ok(new StringResponseDTO(MessageConstants.OK.getMessage())).build();
+    }
+
+    @GET
+    public Response getAll() {
+        List<LabWorkResponseDTO> labWorks = service.getAll();
+        return Response.ok(labWorks).build();
+    }
+
+    @GET
+    @Path("average_point")
+    public Response countGreaterThanAveragePoint(@QueryParam("averagePoint") Float averagePoint) {
+        Long count = service.countGreaterThanAveragePoint(averagePoint);
+        return Response.ok(new LongResponseDTO(count)).build();
+    }
+
+    @GET
+    @Path("description")
+    public Response getByDescription(@QueryParam("prefix") String prefix) {
+        List<String> data = service.getByDescription(prefix);
+        if (data.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new StringResponseDTO(MessageConstants.ERR_NOT_FOUND.getMessage()))
+                    .build();
+        }
+        String names = data.stream().collect(Collectors.joining(", "));
+        String responseString = String.format("Found lab works: %s.", names);
+        return Response.ok(new StringResponseDTO(responseString)).build();
+    }
+}
