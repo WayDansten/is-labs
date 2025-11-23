@@ -1,6 +1,6 @@
 # Compiled class files & folders
 *.class
-target/
+build/
 
 # Log file
 *.log
@@ -26,3 +26,6 @@ replay_pid*
 
 # IDE files & folders
 .vscode
+
+# Build system files & folders
+.gradle/

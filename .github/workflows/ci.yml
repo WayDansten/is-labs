@@ -20,9 +20,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'maven'
+          cache: 'gradle'
       - name: Build backend
-        run: mvn clean package
+        run: gradle war
 
   frontend:
     name: Build & Lint Frontend
