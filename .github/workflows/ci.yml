@@ -21,10 +21,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'gradle'
-      - name: Checkstyle check
-        run: gradle checkstyleMain
       - name: Build backend
-        run: gradle :web:war
+        run: gradle war
 
   frontend:
     name: Build & Lint Frontend

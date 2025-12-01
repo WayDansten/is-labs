@@ -1,6 +1,6 @@
 # Compiled class files & folders
 *.class
-target/
+build/
 
 # Log file
 *.log
@@ -27,8 +27,5 @@ replay_pid*
 # IDE files & folders
 .vscode
 
-# Ignore Gradle project-specific cache directory
-.gradle
-
-# Ignore Gradle build output directory
-build
+# Build system files & folders
+.gradle/
