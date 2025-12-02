@@ -1,0 +1,10 @@
+{
+  "name": "new name",
+  "description": "description",
+  "difficulty": "INSANE",
+  "minimalPoint": 1.0,
+  "averagePoint": 2.0,
+  "disciplineId": 3,
+  "coordinatesId": 1,
+  "authorId": 2
+}

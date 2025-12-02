@@ -58,7 +58,7 @@ const difficulties = ['VERY_EASY', 'NORMAL', 'INSANE', 'IMPOSSIBLE']
 const labWorks = ref([])
 const coordinates = ref([])
 const disciplines = ref([])
-const people = ref([])
+const authors = ref([])
 const locations = ref([])
 
 const selectedLabWork = ref(null)
@@ -123,7 +123,7 @@ socket.onopen = () => {
   refreshLabWorks()
   refreshCoordinates()
   refreshDisciplines()
-  refreshPeople()
+  refreshAuthors()
   refreshLocations()
 }
 
@@ -141,7 +141,7 @@ socket.onmessage = (event) => {
       refreshDisciplines()
       break
     case 'PERSON':
-      refreshPeople()
+      refreshAuthors()
       break
     case 'LOCATION':
       refreshLocations()
@@ -169,10 +169,10 @@ async function refreshDisciplines() {
   disciplines.value = data
 }
 
-async function refreshPeople() {
+async function refreshAuthors() {
   const response = await fetch('http://localhost:8080/lab1/api/person')
   const data = await response.json()
-  people.value = data
+  authors.value = data
 }
 
 async function refreshLocations() {
@@ -258,7 +258,7 @@ async function refreshLocations() {
         <CreateForm
           :coordinates="coordinates"
           :disciplines="disciplines"
-          :people="people"
+          :authors="authors"
           :locations="locations"
           @close-form="toggleCreateForm"
         />

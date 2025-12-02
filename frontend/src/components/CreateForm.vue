@@ -13,12 +13,25 @@ import {
   StepPanel,
   Step,
   DatePicker,
-  Message,
+  FileUpload,
 } from 'primevue'
 import { ref } from 'vue'
 import { useToastNotifier } from '@/composables/useToast'
 
-defineProps(['coordinates', 'disciplines', 'people', 'locations'])
+const props = defineProps({
+  disciplines: {
+    type: Array,
+  },
+  coordinates: {
+    type: Array,
+  },
+  authors: {
+    type: Array,
+  },
+  locations: {
+    type: Array,
+  },
+})
 
 const emit = defineEmits(['closeForm'])
 
@@ -68,54 +81,135 @@ const selectedDiscipline = ref()
 const selectedAuthor = ref()
 const selectedLocation = ref()
 
-const isLabworkNameValid = ref(true)
-const isLabworkMinimalPointValid = ref(true)
-const isLabworkAveragePointValid = ref(true)
-const isDisciplineNameValid = ref(true)
-const isDisciplinePracticeHoursValid = ref(true)
-const isCoordinatesXValid = ref(true)
-const isCoordinatesYValid = ref(true)
-const isAuthorNameValid = ref(true)
-const isAuthorHairColorValid = ref(true)
-const isAuthorBirthdayValid = ref(true)
-const isAuthorNationalityValid = ref(true)
-const isLocationNameValid = ref(true)
-const isLocationXValid = ref(true)
-const isLocationYValid = ref(true)
-const isLocationZValid = ref(true)
-
 const { bakeToast } = useToastNotifier()
 
+const fieldConstraintViolationMessage = (fieldName) => {
+  return `Field constraints violated: ${fieldName}`
+}
+
+const missingFileDataMessage = (objectName) => {
+  return `Missing data in uploaded file for subobject: ${objectName}`
+}
+
+const existingSubobjectNotFoundMessage = (objectName) => {
+  return `Cannot find existing subobject of type: ${objectName}`
+}
+
+const validateLabwork = (labwork) => {
+  if (labwork.name === undefined || labwork.name === '') {
+    bakeToast(fieldConstraintViolationMessage('lab work name'), false)
+    return false
+  }
+
+  if (
+    labwork.minimalPoint !== undefined &&
+    labwork.minimalPoint !== null &&
+    labwork.minimalPoint <= 0
+  ) {
+    bakeToast(fieldConstraintViolationMessage('lab work minimal point'), false)
+    return false
+  }
+
+  if (
+    labwork.averagePoint === undefined ||
+    labwork.averagePoint === null ||
+    labwork.averagePoint <= 0
+  ) {
+    bakeToast(fieldConstraintViolationMessage('lab work average point'), false)
+    return false
+  }
+
+  return true
+}
+
+const validateDiscipline = (discipline) => {
+  if (discipline.name === undefined || discipline.name === '') {
+    bakeToast(fieldConstraintViolationMessage('discipline name'), false)
+    return false
+  }
+
+  if (
+    discipline.practiceHours === undefined ||
+    discipline.practiceHours === null ||
+    discipline.practiceHours < 1
+  ) {
+    bakeToast(fieldConstraintViolationMessage('discipline practice hours'), false)
+    return false
+  }
+
+  return true
+}
+
+const validateCoordinates = (coordinates) => {
+  if (coordinates.x === undefined || coordinates.x === null) {
+    bakeToast(fieldConstraintViolationMessage('coordinates X'), false)
+    return false
+  }
+
+  if (coordinates.y === undefined || coordinates.y === null || coordinates.y < -566) {
+    bakeToast(fieldConstraintViolationMessage('coordinates Y'), false)
+    return false
+  }
+
+  return true
+}
+
+const validateAuthor = (author) => {
+  if (author.name === undefined || author.name === '') {
+    bakeToast(fieldConstraintViolationMessage('author name'), false)
+    return false
+  }
+
+  if (author.hairColor === undefined) {
+    bakeToast(fieldConstraintViolationMessage('author hair color'), false)
+    return false
+  }
+
+  if (author.birthday === undefined) {
+    bakeToast(fieldConstraintViolationMessage('author birthday'), false)
+    return false
+  }
+
+  if (author.nationality === undefined) {
+    bakeToast(fieldConstraintViolationMessage('author nationality'), false)
+    return false
+  }
+
+  return true
+}
+
+const validateLocation = (location) => {
+  if (location.name === undefined || location.name === '' || location.name.length > 246) {
+    bakeToast(fieldConstraintViolationMessage('location name'), false)
+    return false
+  }
+
+  if (location.x === undefined || location.x === null) {
+    bakeToast(fieldConstraintViolationMessage('location X'), false)
+    return false
+  }
+
+  if (location.y === undefined || location.y === null) {
+    bakeToast(fieldConstraintViolationMessage('location Y'), false)
+    return false
+  }
+
+  if (location.z === undefined || location.z === null) {
+    bakeToast(fieldConstraintViolationMessage('location Z'), false)
+    return false
+  }
+
+  return true
+}
+
 const validateStage1 = (activateCallback) => {
-  isLabworkNameValid.value = true
-  isLabworkMinimalPointValid.value = true
-  isLabworkAveragePointValid.value = true
-
-  if (labworkName.value === undefined || labworkName.value === '') {
-    isLabworkNameValid.value = false
+  const labwork = {
+    name: labworkName.value,
+    minimalPoint: labworkMinimalPoint.value,
+    averagePoint: labworkAveragePoint.value,
   }
 
-  if (
-    labworkMinimalPoint.value !== undefined &&
-    labworkMinimalPoint.value !== null &&
-    labworkMinimalPoint.value <= 0
-  ) {
-    isLabworkMinimalPointValid.value = false
-  }
-
-  if (
-    labworkAveragePoint.value === undefined ||
-    labworkAveragePoint.value === null ||
-    labworkAveragePoint.value <= 0
-  ) {
-    isLabworkAveragePointValid.value = false
-  }
-
-  if (
-    isLabworkNameValid.value &&
-    isLabworkMinimalPointValid.value &&
-    isLabworkAveragePointValid.value
-  ) {
+  if (validateLabwork(labwork)) {
     activateCallback('2')
   }
 }
@@ -125,22 +219,12 @@ const validateStage2 = (activateCallback) => {
     activateCallback('3')
   }
 
-  isDisciplineNameValid.value = true
-  isDisciplinePracticeHoursValid.value = true
-
-  if (disciplineName.value === undefined || disciplineName.value === '') {
-    isDisciplineNameValid.value = false
+  const discipline = {
+    name: disciplineName.value,
+    practiceHours: disciplinePracticeHours.value,
   }
 
-  if (
-    disciplinePracticeHours.value === undefined ||
-    disciplinePracticeHours.value === null ||
-    disciplinePracticeHours.value < 1
-  ) {
-    isDisciplinePracticeHoursValid.value = false
-  }
-
-  if (isDisciplineNameValid.value && isDisciplinePracticeHoursValid.value) {
+  if (validateDiscipline(discipline)) {
     activateCallback('3')
   }
 }
@@ -150,22 +234,12 @@ const validateStage3 = (activateCallback) => {
     activateCallback('4')
   }
 
-  isCoordinatesXValid.value = true
-  isCoordinatesYValid.value = true
-
-  if (coordinatesX.value === undefined || coordinatesX.value === null) {
-    isCoordinatesXValid.value = false
+  const coordinates = {
+    x: coordinatesX.value,
+    y: coordinatesY.value,
   }
 
-  if (
-    coordinatesY.value === undefined ||
-    coordinatesY.value === null ||
-    coordinatesY.value < -566
-  ) {
-    isCoordinatesYValid.value = false
-  }
-
-  if (isCoordinatesXValid.value && isCoordinatesYValid.value) {
+  if (validateCoordinates(coordinates)) {
     activateCallback('4')
   }
 }
@@ -175,33 +249,14 @@ const validateStage4 = (activateCallback) => {
     activateCallback('5')
   }
 
-  isAuthorNameValid.value = true
-  isAuthorHairColorValid.value = true
-  isAuthorBirthdayValid.value = true
-  isAuthorNationalityValid.value = true
-
-  if (authorName.value === undefined || authorName.value === '') {
-    isAuthorNameValid.value = false
+  const author = {
+    name: authorName.value,
+    hairColor: authorHairColor.value,
+    birthday: authorBirthday.value,
+    nationality: authorNationality.value,
   }
 
-  if (authorHairColor.value === undefined) {
-    isAuthorHairColorValid.value = false
-  }
-
-  if (authorBirthday.value === undefined) {
-    isAuthorBirthdayValid.value = false
-  }
-
-  if (authorNationality.value === undefined) {
-    isAuthorNationalityValid.value = false
-  }
-
-  if (
-    isAuthorNameValid.value &&
-    isAuthorHairColorValid.value &&
-    isAuthorBirthdayValid.value &&
-    isAuthorNationalityValid.value
-  ) {
+  if (validateAuthor(author)) {
     activateCallback('5')
   }
 }
@@ -211,77 +266,59 @@ const validateStage5 = () => {
     createEntry()
   }
 
-  isLocationNameValid.value = true
-  isLocationXValid.value = true
-  isLocationYValid.value = true
-  isLocationZValid.value = true
-
-  if (
-    locationName.value === undefined ||
-    locationName.value === '' ||
-    locationName.value.length > 246
-  ) {
-    isLocationNameValid.value = false
+  const location = {
+    name: locationName.value,
+    x: locationX.value,
+    y: locationY.value,
+    z: locationZ.value,
   }
 
-  if (locationX.value === undefined || locationX.value === null) {
-    isLocationXValid.value = false
-  }
-
-  if (locationY.value === undefined || locationY.value === null) {
-    isLocationYValid.value = false
-  }
-
-  if (locationZ.value === undefined || locationZ.value === null) {
-    isLocationZValid.value = false
-  }
-
-  if (
-    isLocationNameValid.value &&
-    isLocationXValid.value &&
-    isLocationYValid.value &&
-    isLocationZValid.value
-  ) {
+  if (validateLocation(location)) {
     createEntry()
   }
 }
 
-async function createEntry() {
-  const body = {
-    name: labworkName.value,
-    description: labworkDescription.value,
-    difficulty: labworkDifficulty.value,
-    minimalPoint: labworkMinimalPoint.value,
-    averagePoint: labworkAveragePoint.value,
-    discipline: selectedDiscipline.value
-      ? selectedDiscipline.value
-      : {
-          name: disciplineName.value,
-          practiceHours: disciplinePracticeHours.value,
-        },
-    coordinates: selectedCoordinates.value
-      ? selectedCoordinates.value
-      : {
-          x: coordinatesX.value,
-          y: coordinatesY.value,
-        },
-    author: selectedAuthor.value
-      ? selectedAuthor.value
-      : {
-          name: authorName.value,
-          eyeColor: authorEyeColor.value,
-          hairColor: authorHairColor.value,
-          birthday: new Date(authorBirthday.value).toISOString().slice(0, -1),
-          nationality: authorNationality.value,
-          location: selectedLocation.value
-            ? selectedLocation.value
-            : {
-                name: locationName.value,
-                x: locationX.value,
-                y: locationY.value,
-                z: locationZ.value,
-              },
-        },
+async function createEntry(entry = null) {
+  let body
+  if (entry !== null) {
+    body = entry
+  } else {
+    body = {
+      name: labworkName.value,
+      description: labworkDescription.value,
+      difficulty: labworkDifficulty.value,
+      minimalPoint: labworkMinimalPoint.value,
+      averagePoint: labworkAveragePoint.value,
+      discipline: selectedDiscipline.value
+        ? selectedDiscipline.value
+        : {
+            name: disciplineName.value,
+            practiceHours: disciplinePracticeHours.value,
+          },
+      coordinates: selectedCoordinates.value
+        ? selectedCoordinates.value
+        : {
+            x: coordinatesX.value,
+            y: coordinatesY.value,
+          },
+      author: selectedAuthor.value
+        ? selectedAuthor.value
+        : {
+            name: authorName.value,
+            eyeColor: authorEyeColor.value,
+            hairColor: authorHairColor.value,
+            birthday: new Date(authorBirthday.value).toISOString().slice(0, -1),
+            nationality: authorNationality.value,
+            location: selectedLocation.value
+              ? selectedLocation.value
+              : {
+                  name: locationName.value,
+                  x: locationX.value,
+                  y: locationY.value,
+                  z: locationZ.value,
+                },
+          },
+    }
   }
 
   const response = await fetch('http://localhost:8080/lab1/api/labwork', {
@@ -299,6 +336,110 @@ async function createEntry() {
     emitCloseForm()
   }
 }
+
+const resolveDiscipline = (entry) => {
+  if (!entry.discipline && !entry.disciplineId) {
+    bakeToast(missingFileDataMessage('discipline'), false)
+    return false
+  }
+
+  if (entry.discipline) {
+    return validateDiscipline(entry.discipline)
+  }
+
+  for (let discipline of props.disciplines) {
+    if (entry.disciplineId === discipline.id) {
+      entry.discipline = discipline
+      return true
+    }
+  }
+
+  bakeToast(existingSubobjectNotFoundMessage('discipline'))
+  return false
+}
+
+const resolveCoordinates = (entry) => {
+  if (!entry.coordinates && !entry.coordinatesId) {
+    bakeToast(missingFileDataMessage('coordinates'), false)
+    return false
+  }
+
+  if (entry.coordinates) {
+    return validateCoordinates(entry.coordinates)
+  }
+
+  for (let coordinates of props.coordinates) {
+    if (entry.coordinatesId === coordinates.id) {
+      entry.coordinates = coordinates
+      return true
+    }
+  }
+
+  bakeToast(existingSubobjectNotFoundMessage('coordinates'))
+  return false
+}
+
+const resolveAuthor = (entry) => {
+  if (!entry.author && !entry.authorId) {
+    bakeToast(missingFileDataMessage('author'), false)
+    return false
+  }
+
+  if (entry.author) {
+    return validateAuthor(entry.author)
+  }
+
+  for (let author of props.authors) {
+    if (entry.authorId === author.id) {
+      entry.author = author
+      return true
+    }
+  }
+
+  bakeToast(existingSubobjectNotFoundMessage('author'))
+  return false
+}
+
+const resolveLocation = (entry) => {
+  if (entry.author && !entry.author.location && !entry.author.locationId) {
+    bakeToast(missingFileDataMessage('location'), false)
+    return false
+  }
+
+  if (entry.author.location) {
+    return validateLocation(entry.author.location)
+  }
+
+  for (let location of props.locations) {
+    if (entry.author.locationId === location.id) {
+      entry.author.location = location
+      return true
+    }
+  }
+
+  bakeToast(existingSubobjectNotFoundMessage('location'))
+  return false
+}
+
+const onFileSelect = async (event) => {
+  const file = event.files[0]
+
+  try {
+    const text = await file.text()
+    const entry = JSON.parse(text)
+    if (
+      validateLabwork(entry) &&
+      resolveDiscipline(entry) &&
+      resolveCoordinates(entry) &&
+      resolveAuthor(entry) &&
+      resolveLocation(entry)
+    ) {
+      createEntry(entry)
+    }
+  } catch {
+    bakeToast('Failed to process the file: uploaded file is not of JSON format.', false)
+  }
+}
 </script>
 
 <template>
@@ -312,69 +453,73 @@ async function createEntry() {
     </StepList>
     <StepPanels>
       <StepPanel v-slot="{ activateCallback }" value="1">
-        <IftaLabel>
-          <InputText
-            id="formNameInput"
-            v-model="labworkName"
-            variant="filled"
-            placeholder="Required"
-          ></InputText>
-          <Message v-if="!isLabworkNameValid" severity="error"
-            >Field is required to proceed</Message
-          >
-          <label for="formNameInput">Name</label>
-        </IftaLabel>
+        <div style="display: flex; justify-content: space-evenly">
+          <div style="display: flex; flex-direction: column; align-items: flex-start">
+            <IftaLabel>
+              <InputText
+                id="formNameInput"
+                v-model="labworkName"
+                variant="filled"
+                placeholder="Required"
+              ></InputText>
+              <label for="formNameInput">Name</label>
+            </IftaLabel>
 
-        <IftaLabel>
-          <Textarea
-            id="formDescriptionInput"
-            v-model="labworkDescription"
-            variant="filled"
-          ></Textarea>
-          <label for="formDescriptionInput">Description</label>
-        </IftaLabel>
+            <IftaLabel>
+              <Textarea
+                id="formDescriptionInput"
+                v-model="labworkDescription"
+                variant="filled"
+              ></Textarea>
+              <label for="formDescriptionInput">Description</label>
+            </IftaLabel>
 
-        <IftaLabel>
-          <Select
-            id="formDifficultyInput"
-            v-model="labworkDifficulty"
-            :options="difficulties"
-            variant="filled"
-          ></Select>
-          <label for="formDifficultyInput">Difficulty</label>
-        </IftaLabel>
+            <IftaLabel>
+              <Select
+                id="formDifficultyInput"
+                v-model="labworkDifficulty"
+                :options="difficulties"
+                variant="filled"
+              ></Select>
+              <label for="formDifficultyInput">Difficulty</label>
+            </IftaLabel>
 
-        <IftaLabel>
-          <InputNumber
-            id="formMinimalPointInput"
-            v-model="labworkMinimalPoint"
-            variant="filled"
-            :use-grouping="false"
-            :min-fraction-digits="0"
-            :max-fraction-digits="5"
-            placeholder="Greater than 0"
-          ></InputNumber>
-          <Message v-if="!isLabworkMinimalPointValid" severity="error"
-            >Field needs to be greater than 0</Message
-          >
-          <label for="formMinimalPointInput">Minimal point</label>
-        </IftaLabel>
+            <IftaLabel>
+              <InputNumber
+                id="formMinimalPointInput"
+                v-model="labworkMinimalPoint"
+                variant="filled"
+                :use-grouping="false"
+                :min-fraction-digits="0"
+                :max-fraction-digits="5"
+                placeholder="Greater than 0"
+              ></InputNumber>
+              <label for="formMinimalPointInput">Minimal point</label>
+            </IftaLabel>
 
-        <IftaLabel>
-          <InputNumber
-            id="formAveragePointInput"
-            v-model="labworkAveragePoint"
-            variant="filled"
-            :use-grouping="false"
-            :min-fraction-digits="0"
-            :max-fraction-digits="5"
-            placeholder="Required; value > 0"
-          ></InputNumber>
-          <Message v-if="!isLabworkAveragePointValid" severity="error"
-            >Field is required to proceed and needs to be greater than 0</Message
-          >
-          <label for="formAveragePointInput">Average point</label>
-        </IftaLabel>
+            <IftaLabel>
+              <InputNumber
+                id="formAveragePointInput"
+                v-model="labworkAveragePoint"
+                variant="filled"
+                :use-grouping="false"
+                :min-fraction-digits="0"
+                :max-fraction-digits="5"
+                placeholder="Required; value > 0"
+              ></InputNumber>
+              <label for="formAveragePointInput">Average point</label>
+            </IftaLabel>
+          </div>
+
+          <div style="display: flex; align-items: center">
+            <FileUpload
+              mode="basic"
+              @select="onFileSelect"
+              chooseLabel="Upload a file"
+              :custom-upload="true"
+            />
+          </div>
+        </div>
 
         <div style="display: flex; justify-content: flex-end">
           <Button label="Next" @click="validateStage1(activateCallback)"></Button>
@@ -407,9 +552,6 @@ async function createEntry() {
               variant="filled"
               placeholder="Required"
             ></InputText>
-            <Message v-if="!isDisciplineNameValid" severity="error"
-              >Field is required to proceed</Message
-            >
             <label for="formDisciplineNameInput">Discipline name</label>
           </IftaLabel>
 
@@ -421,9 +563,6 @@ async function createEntry() {
               :use-grouping="false"
               placeholder="Required; value >= 1"
             ></InputNumber>
-            <Message v-if="!isDisciplinePracticeHoursValid" severity="error"
-              >Field is required to proceed and needs to be greater than or equal to 1</Message
-            >
             <label for="formDisciplinePracticeHoursInput">Practice hours</label>
           </IftaLabel>
         </div>
@@ -474,9 +613,6 @@ async function createEntry() {
               :max-fraction-digits="5"
               placeholder="Required"
             ></InputNumber>
-            <Message v-if="!isCoordinatesXValid" severity="error"
-              >Field is required to proceed</Message
-            >
             <label for="formCoordinatesXInput">X coordinate</label>
           </IftaLabel>
 
@@ -490,9 +626,6 @@ async function createEntry() {
               :max-fraction-digits="5"
               placeholder="Required; value >= -566"
             ></InputNumber>
-            <Message v-if="!isCoordinatesYValid" severity="error"
-              >Field is required to proceed and needs to be greater than or equal to -566</Message
-            >
             <label for="formCoordinatesYInput">Y coordinate</label>
           </IftaLabel>
         </div>
@@ -514,7 +647,7 @@ async function createEntry() {
         <div v-if="authorMode === 'existing'">
           <Select
             v-model="selectedAuthor"
-            :options="people"
+            :options="authors"
             placeholder="Select existing author"
             variant="filled"
             option-label="name"
@@ -530,9 +663,6 @@ async function createEntry() {
               variant="filled"
               placeholder="Required"
             ></InputText>
-            <Message v-if="!isAuthorNameValid" severity="error"
-              >Field is required to proceed</Message
-            >
             <label for="formAuthorNameInput">Author name</label>
           </IftaLabel>
 
@@ -554,9 +684,6 @@ async function createEntry() {
               variant="filled"
               placeholder="Required"
             ></Select>
-            <Message v-if="!isAuthorHairColorValid" severity="error"
-              >Field is required to proceed</Message
-            >
             <label for="formAuthorHairColorInput">Hair color</label>
           </IftaLabel>
 
@@ -567,9 +694,6 @@ async function createEntry() {
               variant="filled"
               placeholder="Required"
             ></DatePicker>
-            <Message v-if="!isAuthorBirthdayValid" severity="error"
-              >Field is required to proceed</Message
-            >
             <label for="formAuthorBirthdayInput">Birthday</label>
           </IftaLabel>
 
@@ -581,9 +705,6 @@ async function createEntry() {
               variant="filled"
               placeholder="Required"
             ></Select>
-            <Message v-if="!isAuthorNationalityValid" severity="error"
-              >Field is required to proceed</Message
-            >
             <label for="formAuthorNationalityInput">Nationality</label>
           </IftaLabel>
         </div>
@@ -624,9 +745,6 @@ async function createEntry() {
               variant="filled"
               placeholder="Required; 246 characters at most"
             ></InputText>
-            <Message v-if="!isLocationNameValid" severity="error"
-              >Field is required to proceed and can be 246 characters long at most</Message
-            >
             <label for="formLocationNameInput">Location name</label>
           </IftaLabel>
 
@@ -638,9 +756,6 @@ async function createEntry() {
               :use-grouping="false"
               placeholder="Required"
             ></InputNumber>
-            <Message v-if="!isLocationXValid" severity="error"
-              >Field is required to proceed</Message
-            >
             <label for="formLocationXInput">X coordinate</label>
           </IftaLabel>
 
@@ -654,9 +769,6 @@ async function createEntry() {
               :max-fraction-digits="5"
               placeholder="Required"
             ></InputNumber>
-            <Message v-if="!isLocationYValid" severity="error"
-              >Field is required to proceed</Message
-            >
             <label for="formLocationYInput">Y coordinate</label>
           </IftaLabel>
 
@@ -670,9 +782,6 @@ async function createEntry() {
               :max-fraction-digits="5"
               placeholder="Required"
             ></InputNumber>
-            <Message v-if="!isLocationZValid" severity="error"
-              >Field is required to proceed</Message
-            >
             <label for="formLocationZInput">Z coordinate</label>
           </IftaLabel>
         </div>
