@@ -337,8 +337,22 @@ async function createEntry(entry = null) {
   }
 }
 
+async function createBatch(entries) {
+  const body = entries
+  const response = await fetch('http://localhost:8080/lab1/api/labwork/batch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+  const data = await response.json()
+
+  bakeToast(data.string, response.ok)
+}
+
 const resolveDiscipline = (entry) => {
-  if (!entry.discipline && !entry.disciplineId) {
+  if (!entry.discipline && !entry.disciplineName) {
     bakeToast(missingFileDataMessage('discipline'), false)
     return false
   }
@@ -347,8 +361,8 @@ const resolveDiscipline = (entry) => {
     return validateDiscipline(entry.discipline)
   }
 
-  for (let discipline of props.disciplines) {
-    if (entry.disciplineId === discipline.id) {
+  for (const discipline of props.disciplines) {
+    if (entry.disciplineName === discipline.name) {
       entry.discipline = discipline
       return true
     }
@@ -368,7 +382,7 @@ const resolveCoordinates = (entry) => {
     return validateCoordinates(entry.coordinates)
   }
 
-  for (let coordinates of props.coordinates) {
+  for (const coordinates of props.coordinates) {
     if (entry.coordinatesId === coordinates.id) {
       entry.coordinates = coordinates
       return true
@@ -380,7 +394,7 @@ const resolveCoordinates = (entry) => {
 }
 
 const resolveAuthor = (entry) => {
-  if (!entry.author && !entry.authorId) {
+  if (!entry.author && !entry.authorName) {
     bakeToast(missingFileDataMessage('author'), false)
     return false
   }
@@ -389,8 +403,8 @@ const resolveAuthor = (entry) => {
     return validateAuthor(entry.author)
   }
 
-  for (let author of props.authors) {
-    if (entry.authorId === author.id) {
+  for (const author of props.authors) {
+    if (entry.authorName === author.id) {
       entry.author = author
       return true
     }
@@ -401,7 +415,7 @@ const resolveAuthor = (entry) => {
 }
 
 const resolveLocation = (entry) => {
-  if (entry.author && !entry.author.location && !entry.author.locationId) {
+  if (entry.author && !entry.author.location && !entry.author.locationName) {
     bakeToast(missingFileDataMessage('location'), false)
     return false
   }
@@ -410,8 +424,8 @@ const resolveLocation = (entry) => {
     return validateLocation(entry.author.location)
   }
 
-  for (let location of props.locations) {
-    if (entry.author.locationId === location.id) {
+  for (const location of props.locations) {
+    if (entry.author.locationName === location.id) {
       entry.author.location = location
       return true
     }
@@ -426,15 +440,30 @@ const onFileSelect = async (event) => {
 
   try {
     const text = await file.text()
-    const entry = JSON.parse(text)
-    if (
-      validateLabwork(entry) &&
-      resolveDiscipline(entry) &&
-      resolveCoordinates(entry) &&
-      resolveAuthor(entry) &&
-      resolveLocation(entry)
-    ) {
-      createEntry(entry)
+    const entries = JSON.parse(text)
+
+    if (!Array.isArray(entries)) {
+      bakeToast('Uploaded file does not contain an array of objects', false)
+    } else {
+      let valid = true
+      for (const entry of entries) {
+        if (
+          !(
+            validateLabwork(entry) &&
+            resolveDiscipline(entry) &&
+            resolveCoordinates(entry) &&
+            resolveAuthor(entry) &&
+            resolveLocation(entry)
+          )
+        ) {
+          valid = false
+          break
+        }
+      }
+
+      if (valid) {
+        createBatch(entries)
+      }
     }
   } catch {
     bakeToast('Failed to process the file: uploaded file is not of JSON format.', false)

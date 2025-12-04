@@ -1,6 +1,7 @@
 # Compiled class files & folders
 *.class
 build/
+bin
 
 # Log file
 *.log
