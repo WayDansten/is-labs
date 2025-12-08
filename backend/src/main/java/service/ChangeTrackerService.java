@@ -51,7 +51,7 @@ public class ChangeTrackerService {
             changedTypes.add(WebSocketMessageType.COORDINATES);
         } else {
             CoordinatesRequestDTO dto = labWorkDTO.getCoordinates();
-            Coordinates entity = coordinatesRepository.getByKey(dto.getId()).orElseThrow(() -> new EntityNotFoundException());
+            Coordinates entity = coordinatesRepository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
             if (!(Objects.equals(dto.getX(), entity.getX())
                     && Objects.equals(dto.getY(), entity.getY()))) {
                 changedTypes.add(WebSocketMessageType.COORDINATES);
@@ -62,7 +62,7 @@ public class ChangeTrackerService {
             changedTypes.add(WebSocketMessageType.DISCIPLINE);
         } else {
             DisciplineRequestDTO dto = labWorkDTO.getDiscipline();
-            Discipline entity = disciplineRepository.getByKey(dto.getId()).orElseThrow(() -> new EntityNotFoundException());
+            Discipline entity = disciplineRepository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
             if (!(Objects.equals(dto.getName(), entity.getName())
                     && Objects.equals(dto.getPracticeHours(), entity.getPracticeHours()))) {
                 changedTypes.add(WebSocketMessageType.DISCIPLINE);
@@ -73,7 +73,7 @@ public class ChangeTrackerService {
             changedTypes.add(WebSocketMessageType.PERSON);
         } else {
             PersonRequestDTO dto = labWorkDTO.getAuthor();
-            Person entity = personRepository.getByKey(dto.getId()).orElseThrow(() -> new EntityNotFoundException());
+            Person entity = personRepository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
             if (!(Objects.equals(dto.getName(), entity.getName())
                     && Objects.equals(dto.getBirthday(), entity.getBirthday())
                     && Objects.equals(dto.getEyeColor(), entity.getEyeColor())
@@ -89,7 +89,7 @@ public class ChangeTrackerService {
             changedTypes.add(WebSocketMessageType.PERSON);
         } else {
             LocationRequestDTO dto = labWorkDTO.getAuthor().getLocation();
-            Location entity = locationRepository.getByKey(dto.getId()).orElseThrow(() -> new EntityNotFoundException());
+            Location entity = locationRepository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
             if (!(Objects.equals(dto.getName(), entity.getName())
                     && Objects.equals(dto.getX(), entity.getX())
                     && Objects.equals(dto.getY(), entity.getY())

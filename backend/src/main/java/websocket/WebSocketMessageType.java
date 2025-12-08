@@ -5,5 +5,6 @@ public enum WebSocketMessageType {
     PERSON,
     COORDINATES,
     LOCATION,
-    DISCIPLINE
+    DISCIPLINE,
+    UPLOAD
 }

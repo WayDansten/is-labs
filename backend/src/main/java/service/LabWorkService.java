@@ -9,6 +9,7 @@ import dto.labwork.LabWorkRequestDTO;
 import dto.labwork.LabWorkResponseDTO;
 import dto.misc.DifficultyRequestDTO;
 import entity.LabWork;
+import entity.Upload;
 import entity.types.Difficulty;
 import event.EventPublisher;
 import exception.DifficultyException;
@@ -25,14 +26,19 @@ import websocket.WebSocketMessageType;
 @NoArgsConstructor
 public class LabWorkService {
     private LabWorkMapper mapper;
-    private LabWorkRepository repository;
+    private LabWorkRepository labWorkRepository;
+    private UploadService uploadService;
     private ChangeTrackerService trackerService;
     private EventPublisher eventPublisher;
 
     @Inject
-    public LabWorkService(LabWorkMapper mapper, LabWorkRepository repository, ChangeTrackerService trackerService, EventPublisher eventPublisher) {
+    public LabWorkService(
+            LabWorkMapper mapper, LabWorkRepository labWorkRepository,
+            UploadService uploadService, ChangeTrackerService trackerService,
+            EventPublisher eventPublisher) {
         this.mapper = mapper;
-        this.repository = repository;
+        this.labWorkRepository = labWorkRepository;
+        this.uploadService = uploadService;
         this.trackerService = trackerService;
         this.eventPublisher = eventPublisher;
     }
@@ -41,15 +47,30 @@ public class LabWorkService {
     public void add(LabWorkRequestDTO dto) {
         Set<WebSocketMessageType> changedTypes = trackerService.trackChanges(dto);
         LabWork entity = mapper.toEntity(dto);
-        repository.add(entity);
+        labWorkRepository.add(entity);
         eventPublisher.fireEvent(changedTypes);
+    }
+
+    @Transactional
+    public void addBatch(List<LabWorkRequestDTO> dtos) {
+        Upload upload = uploadService.add();
+        try {
+            for (LabWorkRequestDTO dto : dtos) {
+                add(dto);
+            }
+            uploadService.setUploadSuccess(upload.getId(), dtos.size());
+        } finally {
+            Set<WebSocketMessageType> changedTypes = new HashSet<>();
+            changedTypes.add(WebSocketMessageType.UPLOAD);
+            eventPublisher.fireEvent(changedTypes);
+        }
     }
 
     @Transactional
     public void update(LabWorkRequestDTO dto) {
         Set<WebSocketMessageType> changedTypes = trackerService.trackChanges(dto);
         LabWork entity = mapper.toEntity(dto);
-        repository.update(entity);
+        labWorkRepository.update(entity);
         eventPublisher.fireEvent(changedTypes);
     }
 
@@ -59,13 +80,13 @@ public class LabWorkService {
         Integer steps = dto.getSteps();
         Set<WebSocketMessageType> changedTypes = new HashSet<>();
         changedTypes.add(WebSocketMessageType.LABWORK);
-        LabWork entity = repository.getByKey(id).orElseThrow(() -> new EntityNotFoundException());
+        LabWork entity = labWorkRepository.getByKey(id).orElseThrow(EntityNotFoundException::new);
         if (entity.getDifficulty().getValue() - steps <= 0) {
             throw new DifficultyException();
         }
         Difficulty newDifficulty = Difficulty.getByValue(entity.getDifficulty().getValue() - steps);
         entity.setDifficulty(newDifficulty);
-        repository.update(entity);
+        labWorkRepository.update(entity);
         eventPublisher.fireEvent(changedTypes);
     }
 
@@ -73,7 +94,7 @@ public class LabWorkService {
     public void delete(Integer id) {
         Set<WebSocketMessageType> changedTypes = new HashSet<>();
         changedTypes.add(WebSocketMessageType.LABWORK);
-        repository.deleteByKey(id);
+        labWorkRepository.deleteByKey(id);
         eventPublisher.fireEvent(changedTypes);
     }
 
@@ -81,26 +102,26 @@ public class LabWorkService {
     public void deleteByAuthor(String author) {
         Set<WebSocketMessageType> changedTypes = new HashSet<>();
         changedTypes.add(WebSocketMessageType.LABWORK);
-        List<LabWork> labWorks = repository.getByAuthor(author);
+        List<LabWork> labWorks = labWorkRepository.getByAuthor(author);
         if (labWorks.isEmpty()) {
             throw new EntityNotFoundException();
         }
-        repository.delete(labWorks.get(0));
+        labWorkRepository.delete(labWorks.get(0));
         eventPublisher.fireEvent(changedTypes);
     }
 
     @Transactional
     public List<LabWorkResponseDTO> getAll() {
-        return repository.getAll().stream().filter(Objects::nonNull).map(mapper::toDTO).toList();
+        return labWorkRepository.getAll().stream().filter(Objects::nonNull).map(mapper::toDTO).toList();
     }
 
     @Transactional
     public Long countGreaterThanAveragePoint(Float averagePoint) {
-        return repository.countGreaterThanAveragePoint(averagePoint);
+        return labWorkRepository.countGreaterThanAveragePoint(averagePoint);
     }
 
     @Transactional
     public List<String> getByDescription(String prefix) {
-        return repository.getByDescription(prefix);
+        return labWorkRepository.getByDescription(prefix);
     }
 }

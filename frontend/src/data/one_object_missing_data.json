@@ -4,9 +4,7 @@
     "description": "description",
     "difficulty": "INSANE",
     "minimalPoint": 1.0,
-    "averagePoint": 2.0,
     "disciplineName": "Computer Graphics Algorithms",
-    "coordinatesId": 1,
     "authorName": "Timofey Goroshnikov"
   }
 ]

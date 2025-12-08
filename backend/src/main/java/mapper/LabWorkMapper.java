@@ -5,19 +5,27 @@ import dto.labwork.LabWorkResponseDTO;
 import entity.LabWork;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.NoArgsConstructor;
+import repository.LabWorkRepository;
 
 @ApplicationScoped
+@NoArgsConstructor
 public class LabWorkMapper {
-
+    private LabWorkRepository repository;
     private PersonMapper personMapper;
     private DisciplineMapper disciplineMapper;
     private CoordinatesMapper coordinatesMapper;
 
     @Inject
-    public LabWorkMapper() {
-        this.personMapper = new PersonMapper();
-        this.disciplineMapper = new DisciplineMapper();
-        this.coordinatesMapper = new CoordinatesMapper();
+    public LabWorkMapper(
+        LabWorkRepository repository, PersonMapper personMapper,
+        DisciplineMapper disciplineMapper, CoordinatesMapper coordinatesMapper
+    ) {
+        this.repository = repository;
+        this.personMapper = personMapper;
+        this.disciplineMapper = disciplineMapper;
+        this.coordinatesMapper = coordinatesMapper;
     }
 
     public LabWorkResponseDTO toDTO(LabWork entity) {
@@ -37,8 +45,7 @@ public class LabWorkMapper {
     public LabWork toEntity(LabWorkRequestDTO dto) {
         LabWork entity = new LabWork();
         if (dto.getId() != null) {
-            entity.setId(dto.getId());
-            entity.setCreationDate(dto.getCreationDate());
+            entity = repository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
         }
         entity.setName(dto.getName());
         entity.setCoordinates(coordinatesMapper.toEntity(dto.getCoordinates()));

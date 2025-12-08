@@ -61,6 +61,8 @@ const disciplines = ref([])
 const authors = ref([])
 const locations = ref([])
 
+const uploads = ref([])
+
 const selectedLabWork = ref(null)
 
 const filters = ref({ id: { value: null, matchMode: 'startsWith' } })
@@ -125,6 +127,7 @@ socket.onopen = () => {
   refreshDisciplines()
   refreshAuthors()
   refreshLocations()
+  refreshUploads()
 }
 
 socket.onmessage = (event) => {
@@ -132,7 +135,6 @@ socket.onmessage = (event) => {
   switch (data.type) {
     case 'LABWORK':
       refreshLabWorks()
-      console.log(labWorks.value)
       break
     case 'COORDINATES':
       refreshCoordinates()
@@ -145,6 +147,9 @@ socket.onmessage = (event) => {
       break
     case 'LOCATION':
       refreshLocations()
+      break
+    case 'UPLOAD':
+      refreshUploads()
       break
     default:
       break
@@ -179,6 +184,12 @@ async function refreshLocations() {
   const response = await fetch('http://localhost:8080/lab1/api/location')
   const data = await response.json()
   locations.value = data
+}
+
+async function refreshUploads() {
+  const response = await fetch('http://localhost:8080/lab1/api/upload')
+  const data = await response.json()
+  uploads.value = data
 }
 </script>
 
@@ -260,6 +271,7 @@ async function refreshLocations() {
           :disciplines="disciplines"
           :authors="authors"
           :locations="locations"
+          :uploads="uploads"
           @close-form="toggleCreateForm"
         />
       </Dialog>

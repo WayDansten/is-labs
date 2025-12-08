@@ -1,23 +1,42 @@
 package mapper;
 
+import java.util.Optional;
+
 import dto.discipline.DisciplineRequestDTO;
 import dto.discipline.DisciplineResponseDTO;
 import entity.Discipline;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.NoArgsConstructor;
+import repository.DisciplineRepository;
 
 @ApplicationScoped
+@NoArgsConstructor
 public class DisciplineMapper {
+    private DisciplineRepository repository;
+
+    @Inject
+    public DisciplineMapper(DisciplineRepository repository) {
+        this.repository = repository;
+    }
+
     public DisciplineResponseDTO toDTO(Discipline entity) {
         return new DisciplineResponseDTO(entity.getId(), entity.getName(), entity.getPracticeHours());
     }
 
     public Discipline toEntity(DisciplineRequestDTO dto) {
-        Discipline entity = new Discipline();
         if (dto.getId() != null) {
-            entity.setId(dto.getId());
+            return repository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
+        } else {
+            Discipline entity = new Discipline();
+            entity.setName(dto.getName());
+            entity.setPracticeHours(dto.getPracticeHours());
+            Optional<Discipline> existing = repository.getIfExists(entity);
+            if (existing.isPresent()) {
+                return existing.get();
+            }
+            return entity;   
         }
-        entity.setName(dto.getName());
-        entity.setPracticeHours(dto.getPracticeHours());
-        return entity;
     }
 }

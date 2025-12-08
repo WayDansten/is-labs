@@ -1,27 +1,15 @@
 [
   {
-    "name": "A&DS 1",
-    "description": "Sorting algorithms",
-    "difficulty": "INSANE",
+    "name": "A&DS 2",
+    "description": 1984,
+    "difficulty": "IMPOSSIBLE",
     "minimalPoint": 5,
-    "averagePoint": 8.5,
+    "averagePoint": -1000,
     "coordinates": {
-      "x": 10.5,
+      "x": 233,
       "y": 20.3
     },
-    "author": {
-      "name": "Legendarych",
-      "eyeColor": "BLUE",
-      "hairColor": "BROWN",
-      "birthday": "2025-10-26T22:43:49.54",
-      "nationality": "SOUTH_KOREA",
-      "location": {
-        "name": "Podolsk",
-        "x": 55,
-        "y": 37.6173,
-        "z": 150.1467
-      }
-    },
+    "authorName": "WayTungsten",
     "discipline": {
       "name": "Algorithms & Data Structures",
       "practiceHours": 120
@@ -42,7 +30,7 @@
       "eyeColor": "GREEN",
       "hairColor": "BLACK",
       "birthday": "2025-10-26T22:43:49.54",
-      "nationality": "USA",
+      "nationality": "RUSSIA",
       "location": {
         "name": "Los-Angeles",
         "x": 40,

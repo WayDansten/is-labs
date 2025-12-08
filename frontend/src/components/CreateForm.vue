@@ -14,11 +14,13 @@ import {
   Step,
   DatePicker,
   FileUpload,
+  DataTable,
+  Column,
 } from 'primevue'
 import { ref } from 'vue'
 import { useToastNotifier } from '@/composables/useToast'
 
-const props = defineProps({
+defineProps({
   disciplines: {
     type: Array,
   },
@@ -29,6 +31,9 @@ const props = defineProps({
     type: Array,
   },
   locations: {
+    type: Array,
+  },
+  uploads: {
     type: Array,
   },
 })
@@ -91,20 +96,34 @@ const missingFileDataMessage = (objectName) => {
   return `Missing data in uploaded file for subobject: ${objectName}`
 }
 
-const existingSubobjectNotFoundMessage = (objectName) => {
-  return `Cannot find existing subobject of type: ${objectName}`
-}
-
 const validateLabwork = (labwork) => {
-  if (labwork.name === undefined || labwork.name === '') {
+  if (labwork.name === undefined || labwork.name === '' || typeof labwork.name !== 'string') {
     bakeToast(fieldConstraintViolationMessage('lab work name'), false)
+    return false
+  }
+
+  if (
+    labwork.description !== undefined &&
+    labwork.description !== null &&
+    typeof labwork.description !== 'string'
+  ) {
+    bakeToast(fieldConstraintViolationMessage('lab work description'), false)
+    return false
+  }
+
+  if (
+    labwork.difficulty !== undefined &&
+    labwork.difficulty !== null &&
+    !difficulties.includes(labwork.difficulty)
+  ) {
+    bakeToast(fieldConstraintViolationMessage('lab work difficulty'), false)
     return false
   }
 
   if (
     labwork.minimalPoint !== undefined &&
     labwork.minimalPoint !== null &&
-    labwork.minimalPoint <= 0
+    (typeof labwork.minimalPoint !== 'number' || labwork.minimalPoint <= 0)
   ) {
     bakeToast(fieldConstraintViolationMessage('lab work minimal point'), false)
     return false
@@ -113,6 +132,7 @@ const validateLabwork = (labwork) => {
   if (
     labwork.averagePoint === undefined ||
     labwork.averagePoint === null ||
+    typeof labwork.averagePoint !== 'number' ||
     labwork.averagePoint <= 0
   ) {
     bakeToast(fieldConstraintViolationMessage('lab work average point'), false)
@@ -123,7 +143,11 @@ const validateLabwork = (labwork) => {
 }
 
 const validateDiscipline = (discipline) => {
-  if (discipline.name === undefined || discipline.name === '') {
+  if (
+    discipline.name === undefined ||
+    discipline.name === '' ||
+    typeof discipline.name !== 'string'
+  ) {
     bakeToast(fieldConstraintViolationMessage('discipline name'), false)
     return false
   }
@@ -131,6 +155,7 @@ const validateDiscipline = (discipline) => {
   if (
     discipline.practiceHours === undefined ||
     discipline.practiceHours === null ||
+    typeof discipline.practiceHours !== 'number' ||
     discipline.practiceHours < 1
   ) {
     bakeToast(fieldConstraintViolationMessage('discipline practice hours'), false)
@@ -141,12 +166,17 @@ const validateDiscipline = (discipline) => {
 }
 
 const validateCoordinates = (coordinates) => {
-  if (coordinates.x === undefined || coordinates.x === null) {
+  if (coordinates.x === undefined || coordinates.x === null || typeof coordinates.x !== 'number') {
     bakeToast(fieldConstraintViolationMessage('coordinates X'), false)
     return false
   }
 
-  if (coordinates.y === undefined || coordinates.y === null || coordinates.y < -566) {
+  if (
+    coordinates.y === undefined ||
+    coordinates.y === null ||
+    typeof coordinates.y !== 'number' ||
+    coordinates.y < -566
+  ) {
     bakeToast(fieldConstraintViolationMessage('coordinates Y'), false)
     return false
   }
@@ -155,13 +185,18 @@ const validateCoordinates = (coordinates) => {
 }
 
 const validateAuthor = (author) => {
-  if (author.name === undefined || author.name === '') {
+  if (author.name === undefined || author.name === '' || typeof author.name !== 'string') {
     bakeToast(fieldConstraintViolationMessage('author name'), false)
     return false
   }
 
-  if (author.hairColor === undefined) {
+  if (author.hairColor === undefined || !colors.includes(author.hairColor)) {
     bakeToast(fieldConstraintViolationMessage('author hair color'), false)
+    return false
+  }
+
+  if (author.eyeColor !== undefined && !colors.includes(author.eyeColor)) {
+    bakeToast(fieldConstraintViolationMessage('author eye color'), false)
     return false
   }
 
@@ -170,7 +205,7 @@ const validateAuthor = (author) => {
     return false
   }
 
-  if (author.nationality === undefined) {
+  if (author.nationality === undefined || !countries.includes(author.nationality)) {
     bakeToast(fieldConstraintViolationMessage('author nationality'), false)
     return false
   }
@@ -179,22 +214,27 @@ const validateAuthor = (author) => {
 }
 
 const validateLocation = (location) => {
-  if (location.name === undefined || location.name === '' || location.name.length > 246) {
+  if (
+    location.name === undefined ||
+    location.name === '' ||
+    typeof location.name !== 'string' ||
+    location.name.length > 246
+  ) {
     bakeToast(fieldConstraintViolationMessage('location name'), false)
     return false
   }
 
-  if (location.x === undefined || location.x === null) {
+  if (location.x === undefined || location.x === null || typeof location.x !== 'number') {
     bakeToast(fieldConstraintViolationMessage('location X'), false)
     return false
   }
 
-  if (location.y === undefined || location.y === null) {
+  if (location.y === undefined || location.y === null || typeof location.y !== 'number') {
     bakeToast(fieldConstraintViolationMessage('location Y'), false)
     return false
   }
 
-  if (location.z === undefined || location.z === null) {
+  if (location.z === undefined || location.z === null || typeof location.z !== 'number') {
     bakeToast(fieldConstraintViolationMessage('location Z'), false)
     return false
   }
@@ -217,6 +257,7 @@ const validateStage1 = (activateCallback) => {
 const validateStage2 = (activateCallback) => {
   if (selectedDiscipline.value && disciplineMode.value === 'existing') {
     activateCallback('3')
+    return
   }
 
   const discipline = {
@@ -232,6 +273,7 @@ const validateStage2 = (activateCallback) => {
 const validateStage3 = (activateCallback) => {
   if (selectedCoordinates.value && coordinatesMode.value === 'existing') {
     activateCallback('4')
+    return
   }
 
   const coordinates = {
@@ -247,6 +289,7 @@ const validateStage3 = (activateCallback) => {
 const validateStage4 = (activateCallback) => {
   if (selectedAuthor.value && authorMode.value === 'existing') {
     activateCallback('5')
+    return
   }
 
   const author = {
@@ -264,6 +307,7 @@ const validateStage4 = (activateCallback) => {
 const validateStage5 = () => {
   if (selectedLocation.value && locationMode.value === 'existing') {
     createEntry()
+    return
   }
 
   const location = {
@@ -352,87 +396,35 @@ async function createBatch(entries) {
 }
 
 const resolveDiscipline = (entry) => {
-  if (!entry.discipline && !entry.disciplineName) {
+  if (!entry.discipline) {
     bakeToast(missingFileDataMessage('discipline'), false)
     return false
   }
-
-  if (entry.discipline) {
-    return validateDiscipline(entry.discipline)
-  }
-
-  for (const discipline of props.disciplines) {
-    if (entry.disciplineName === discipline.name) {
-      entry.discipline = discipline
-      return true
-    }
-  }
-
-  bakeToast(existingSubobjectNotFoundMessage('discipline'))
-  return false
+  return validateDiscipline(entry.discipline)
 }
 
 const resolveCoordinates = (entry) => {
-  if (!entry.coordinates && !entry.coordinatesId) {
+  if (!entry.coordinates) {
     bakeToast(missingFileDataMessage('coordinates'), false)
     return false
   }
-
-  if (entry.coordinates) {
-    return validateCoordinates(entry.coordinates)
-  }
-
-  for (const coordinates of props.coordinates) {
-    if (entry.coordinatesId === coordinates.id) {
-      entry.coordinates = coordinates
-      return true
-    }
-  }
-
-  bakeToast(existingSubobjectNotFoundMessage('coordinates'))
-  return false
+  return validateCoordinates(entry.coordinates)
 }
 
 const resolveAuthor = (entry) => {
-  if (!entry.author && !entry.authorName) {
+  if (!entry.author) {
     bakeToast(missingFileDataMessage('author'), false)
     return false
   }
-
-  if (entry.author) {
-    return validateAuthor(entry.author)
-  }
-
-  for (const author of props.authors) {
-    if (entry.authorName === author.id) {
-      entry.author = author
-      return true
-    }
-  }
-
-  bakeToast(existingSubobjectNotFoundMessage('author'))
-  return false
+  return validateAuthor(entry.author)
 }
 
 const resolveLocation = (entry) => {
-  if (entry.author && !entry.author.location && !entry.author.locationName) {
+  if (entry.author && !entry.author.location) {
     bakeToast(missingFileDataMessage('location'), false)
     return false
   }
-
-  if (entry.author.location) {
-    return validateLocation(entry.author.location)
-  }
-
-  for (const location of props.locations) {
-    if (entry.author.locationName === location.id) {
-      entry.author.location = location
-      return true
-    }
-  }
-
-  bakeToast(existingSubobjectNotFoundMessage('location'))
-  return false
+  return validateLocation(entry.author.location)
 }
 
 const onFileSelect = async (event) => {
@@ -540,13 +532,24 @@ const onFileSelect = async (event) => {
             </IftaLabel>
           </div>
 
-          <div style="display: flex; align-items: center">
+          <div>
             <FileUpload
               mode="basic"
               @select="onFileSelect"
               chooseLabel="Upload a file"
               :custom-upload="true"
             />
+            <DataTable
+              id="uploadTable"
+              :value="uploads"
+              scrollable
+              scroll-height="300px"
+              style="margin-top: 1rem"
+            >
+              <Column field="id" header="ID"></Column>
+              <Column field="status" header="Status"></Column>
+              <Column field="objectsAdded" header="Objects added"></Column>
+            </DataTable>
           </div>
         </div>
 

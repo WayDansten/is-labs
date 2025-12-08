@@ -1,15 +1,27 @@
 [
   {
-    "name": "A&DS 2",
-    "description": "Trees",
-    "difficulty": "IMPOSSIBLE",
+    "name": "A&DS 1",
+    "description": "Sorting algorithms",
+    "difficulty": "INSANE",
     "minimalPoint": 5,
     "averagePoint": 8.5,
     "coordinates": {
-      "x": 233,
+      "x": 10.5,
       "y": 20.3
     },
-    "authorName": "WayTungsten",
+    "author": {
+      "name": "Legendarych",
+      "eyeColor": "BLUE",
+      "hairColor": "BROWN",
+      "birthday": "2025-10-26T22:43:49.54",
+      "nationality": "SOUTH_KOREA",
+      "location": {
+        "name": "Podolsk",
+        "x": 55,
+        "y": 37.6173,
+        "z": 150.1467
+      }
+    },
     "discipline": {
       "name": "Algorithms & Data Structures",
       "practiceHours": 120
@@ -27,7 +39,7 @@
     },
     "author": {
       "name": "Ivan Ivanov",
-      "eyeColor": "GREEN",
+      "eyeColor": "YELLOW",
       "hairColor": "BLACK",
       "birthday": "2025-10-26T22:43:49.54",
       "nationality": "USA",

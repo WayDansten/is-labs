@@ -14,11 +14,12 @@
         <class>entity.LabWork</class>
         <class>entity.Location</class>
         <class>entity.Person</class>
+        <class>entity.Upload</class>
         
         <properties>
             <property name="jakarta.persistence.schema-generation.database.action" value="none"/>
             <property name="eclipselink.target-database" value="PostgreSQL"/>
-            <property name="eclipselink.logging.level" value="FINE"/>
+            <property name="eclipselink.logging.level" value="ALL"/>
             <property name="eclipselink.logging.parameters" value="true"/>
         </properties>
     </persistence-unit>

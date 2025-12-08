@@ -31,7 +31,7 @@ public class LabWork {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "labwork_name", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToOne(cascade = CascadeType.MERGE)

@@ -22,8 +22,8 @@ public abstract class AbstractRepository<T, K> {
         this.entityClass = entityClass;
     }
 
-    public void add(T entity) {
-        em.merge(entity);
+    public T add(T entity) {
+        return em.merge(entity);
     }
 
     public void delete(T entity) {
@@ -49,7 +49,7 @@ public abstract class AbstractRepository<T, K> {
     }
 
     public void deleteByKey(K key) {
-        T entity = this.getByKey(key).orElseThrow(() -> new EntityNotFoundException());
+        T entity = this.getByKey(key).orElseThrow(EntityNotFoundException::new);
         em.remove(entity);
     }
 }

@@ -6,7 +6,7 @@
     "minimalPoint": 1.0,
     "averagePoint": 2.0,
     "discipline": {
-      "name": "discipline name",
+      "name": "discipline",
       "practiceHours": 90
     },
     "coordinates": {
@@ -14,13 +14,13 @@
       "y": 2
     },
     "author": {
-      "name": "author name",
+      "name": "author",
       "eyeColor": "BLUE",
       "hairColor": "BROWN",
       "birthday": "2025-10-26T22:43:49.54",
       "nationality": "USA",
       "location": {
-        "name": "location name",
+        "name": "location",
         "x": 1,
         "y": 2,
         "z": 3

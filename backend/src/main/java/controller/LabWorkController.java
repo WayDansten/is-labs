@@ -21,7 +21,6 @@ import dto.misc.LongResponseDTO;
 import dto.misc.StringRequestDTO;
 import dto.misc.StringResponseDTO;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import service.LabWorkService;
 import util.MessageConstants;
 
@@ -31,8 +30,7 @@ import util.MessageConstants;
 public class LabWorkController {
     private LabWorkService service;
 
-    public LabWorkController() {
-    }
+    public LabWorkController() {}
 
     @Inject
     public LabWorkController(LabWorkService service) {
@@ -48,11 +46,8 @@ public class LabWorkController {
     
     @POST
     @Path("/batch")
-    @Transactional
     public Response addBatch(List<LabWorkRequestDTO> dtos) {
-        for (LabWorkRequestDTO dto : dtos) {
-            service.add(dto);
-        }
+        service.addBatch(dtos);
         return Response.status(Response.Status.CREATED).entity(new StringResponseDTO(MessageConstants.OK.getMessage()))
                 .build();
     }

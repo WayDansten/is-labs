@@ -15,15 +15,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "disciplines")
-public class Discipline {
+@Table(name = "uploads")
+public class Upload {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+    @Column(name = "status", nullable = false)
+    private Boolean status;
 
-    @Column(name = "practice_hours", nullable = false)
-    private Integer practiceHours;
+    @Column(name = "objects_added")
+    private Integer objectsAdded;
 }

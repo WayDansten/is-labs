@@ -4,14 +4,14 @@
     "description": "description",
     "difficulty": "NORMAL",
     "minimalPoint": 1.0,
-    "averagePoint": 2.0,
+    "averagePoint": "sometext",
     "discipline": {
       "name": "discipline name",
       "practiceHours": 90
     },
     "coordinates": {
       "x": 1,
-      "y": 2
+      "y": -1
     },
     "author": {
       "name": "author name",
@@ -19,7 +19,12 @@
       "hairColor": "BROWN",
       "birthday": "2025-10-26T22:43:49.54",
       "nationality": "USA",
-      "locationName": "Oregon"
+      "location": {
+        "name": "Oregon",
+        "x": 123,
+        "y": 354,
+        "z": 3775
+      }
     }
   }
 ]

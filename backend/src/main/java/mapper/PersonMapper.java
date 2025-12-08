@@ -1,19 +1,26 @@
 package mapper;
 
+import java.util.Optional;
+
 import dto.person.PersonRequestDTO;
 import dto.person.PersonResponseDTO;
 import entity.Person;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.NoArgsConstructor;
+import repository.PersonRepository;
 
 @ApplicationScoped
+@NoArgsConstructor
 public class PersonMapper {
-
+    private PersonRepository repository;
     private LocationMapper locationMapper;
 
     @Inject
-    public PersonMapper() {
-        this.locationMapper = new LocationMapper();
+    public PersonMapper(PersonRepository repository, LocationMapper locationMapper) {
+        this.repository = repository;
+        this.locationMapper = locationMapper;
     }
 
     public PersonResponseDTO toDTO(Person entity) {
@@ -22,16 +29,21 @@ public class PersonMapper {
     }
 
     public Person toEntity(PersonRequestDTO dto) {
-        Person entity = new Person();
         if (dto.getId() != null) {
-            entity.setId(dto.getId());
+            return repository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
+        } else {
+            Person entity = new Person();
+            entity.setName(dto.getName());
+            entity.setEyeColor(dto.getEyeColor());
+            entity.setHairColor(dto.getHairColor());
+            entity.setLocation(locationMapper.toEntity(dto.getLocation()));
+            entity.setBirthday(dto.getBirthday());
+            entity.setNationality(dto.getNationality());
+            Optional<Person> existing = repository.getIfExists(entity);
+            if (existing.isPresent()) {
+                return existing.get();
+            }
+            return entity;
         }
-        entity.setName(dto.getName());
-        entity.setEyeColor(dto.getEyeColor());
-        entity.setHairColor(dto.getHairColor());
-        entity.setLocation(locationMapper.toEntity(dto.getLocation()));
-        entity.setBirthday(dto.getBirthday());
-        entity.setNationality(dto.getNationality());
-        return entity;
     }
 }
