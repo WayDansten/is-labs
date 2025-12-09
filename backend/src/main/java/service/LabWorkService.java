@@ -13,6 +13,7 @@ import entity.Upload;
 import entity.types.Difficulty;
 import event.EventPublisher;
 import exception.DifficultyException;
+import jakarta.ejb.TransactionAttribute;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
