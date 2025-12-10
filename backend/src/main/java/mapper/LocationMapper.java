@@ -28,17 +28,16 @@ public class LocationMapper {
     public Location toEntity(LocationRequestDTO dto) {
         if (dto.getId() != null) {
             return repository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
-        } else {
-            Location entity = new Location();
-            entity.setName(dto.getName());
-            entity.setX(dto.getX());
-            entity.setY(dto.getY());
-            entity.setZ(dto.getZ());
-            Optional<Location> existing = repository.getIfExists(entity);
-            if (existing.isPresent()) {
-                return existing.get();
-            }
-            return entity;
         }
+        Location entity = new Location();
+        entity.setName(dto.getName());
+        entity.setX(dto.getX());
+        entity.setY(dto.getY());
+        entity.setZ(dto.getZ());
+        Optional<Location> existing = repository.getIfExists(entity);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        return entity;
     }
 }

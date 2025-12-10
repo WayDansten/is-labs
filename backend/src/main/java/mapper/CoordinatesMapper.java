@@ -28,15 +28,14 @@ public class CoordinatesMapper {
     public Coordinates toEntity(CoordinatesRequestDTO dto) {
         if (dto.getId() != null) {
             return repository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
-        } else {
-            Coordinates entity = new Coordinates();
-            entity.setX(dto.getX());
-            entity.setY(dto.getY());
-            Optional<Coordinates> existing = repository.getIfExists(entity);
-            if (existing.isPresent()) {
-                return existing.get();
-            }
-            return entity;
         }
+        Coordinates entity = new Coordinates();
+        entity.setX(dto.getX());
+        entity.setY(dto.getY());
+        Optional<Coordinates> existing = repository.getIfExists(entity);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        return entity;
     }
 }

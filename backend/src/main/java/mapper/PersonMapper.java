@@ -31,19 +31,18 @@ public class PersonMapper {
     public Person toEntity(PersonRequestDTO dto) {
         if (dto.getId() != null) {
             return repository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
-        } else {
-            Person entity = new Person();
-            entity.setName(dto.getName());
-            entity.setEyeColor(dto.getEyeColor());
-            entity.setHairColor(dto.getHairColor());
-            entity.setLocation(locationMapper.toEntity(dto.getLocation()));
-            entity.setBirthday(dto.getBirthday());
-            entity.setNationality(dto.getNationality());
-            Optional<Person> existing = repository.getIfExists(entity);
-            if (existing.isPresent()) {
-                return existing.get();
-            }
-            return entity;
         }
+        Person entity = new Person();
+        entity.setName(dto.getName());
+        entity.setEyeColor(dto.getEyeColor());
+        entity.setHairColor(dto.getHairColor());
+        entity.setLocation(locationMapper.toEntity(dto.getLocation()));
+        entity.setBirthday(dto.getBirthday());
+        entity.setNationality(dto.getNationality());
+        Optional<Person> existing = repository.getIfExists(entity);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        return entity;
     }
 }

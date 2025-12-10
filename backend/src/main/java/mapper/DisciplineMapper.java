@@ -28,15 +28,14 @@ public class DisciplineMapper {
     public Discipline toEntity(DisciplineRequestDTO dto) {
         if (dto.getId() != null) {
             return repository.getByKey(dto.getId()).orElseThrow(EntityNotFoundException::new);
-        } else {
-            Discipline entity = new Discipline();
-            entity.setName(dto.getName());
-            entity.setPracticeHours(dto.getPracticeHours());
-            Optional<Discipline> existing = repository.getIfExists(entity);
-            if (existing.isPresent()) {
-                return existing.get();
-            }
-            return entity;   
         }
+        Discipline entity = new Discipline();
+        entity.setName(dto.getName());
+        entity.setPracticeHours(dto.getPracticeHours());
+        Optional<Discipline> existing = repository.getIfExists(entity);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        return entity;   
     }
 }
