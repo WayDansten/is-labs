@@ -3,17 +3,21 @@ package service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import dto.labwork.LabWorkRequestDTO;
 import dto.labwork.LabWorkResponseDTO;
 import dto.misc.DifficultyRequestDTO;
+import entity.Coordinates;
+import entity.Discipline;
 import entity.LabWork;
+import entity.Location;
+import entity.Person;
 import entity.Upload;
 import entity.types.Difficulty;
 import event.EventPublisher;
 import exception.DifficultyException;
-import jakarta.ejb.TransactionAttribute;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +25,10 @@ import jakarta.transaction.Transactional;
 import lombok.NoArgsConstructor;
 import mapper.LabWorkMapper;
 import repository.LabWorkRepository;
+import repository.DisciplineRepository;
+import repository.CoordinatesRepository;
+import repository.PersonRepository;
+import repository.LocationRepository;
 import websocket.WebSocketMessageType;
 
 @ApplicationScoped
@@ -28,6 +36,10 @@ import websocket.WebSocketMessageType;
 public class LabWorkService {
     private LabWorkMapper mapper;
     private LabWorkRepository labWorkRepository;
+    private DisciplineRepository disciplineRepository;
+    private CoordinatesRepository coordinatesRepository;
+    private PersonRepository personRepository;
+    private LocationRepository locationRepository;
     private UploadService uploadService;
     private ChangeTrackerService trackerService;
     private EventPublisher eventPublisher;
@@ -35,10 +47,16 @@ public class LabWorkService {
     @Inject
     public LabWorkService(
             LabWorkMapper mapper, LabWorkRepository labWorkRepository,
+            DisciplineRepository disciplineRepository, CoordinatesRepository coordinatesRepository,
+            PersonRepository personRepository, LocationRepository locationRepository,
             UploadService uploadService, ChangeTrackerService trackerService,
             EventPublisher eventPublisher) {
         this.mapper = mapper;
         this.labWorkRepository = labWorkRepository;
+        this.disciplineRepository = disciplineRepository;
+        this.coordinatesRepository = coordinatesRepository;
+        this.personRepository = personRepository;
+        this.locationRepository = locationRepository;
         this.uploadService = uploadService;
         this.trackerService = trackerService;
         this.eventPublisher = eventPublisher;
@@ -48,6 +66,7 @@ public class LabWorkService {
     public void add(LabWorkRequestDTO dto) {
         Set<WebSocketMessageType> changedTypes = trackerService.trackChanges(dto);
         LabWork entity = mapper.toEntity(dto);
+        setExistingFields(entity);
         labWorkRepository.add(entity);
         eventPublisher.fireEvent(changedTypes);
     }
@@ -71,6 +90,7 @@ public class LabWorkService {
     public void update(LabWorkRequestDTO dto) {
         Set<WebSocketMessageType> changedTypes = trackerService.trackChanges(dto);
         LabWork entity = mapper.toEntity(dto);
+        setExistingFields(entity);
         labWorkRepository.update(entity);
         eventPublisher.fireEvent(changedTypes);
     }
@@ -124,5 +144,60 @@ public class LabWorkService {
     @Transactional
     public List<String> getByDescription(String prefix) {
         return labWorkRepository.getByDescription(prefix);
+    }
+
+    private void setExistingFields(LabWork entity) {
+        Discipline discipline = entity.getDiscipline();
+        Coordinates coordinates = entity.getCoordinates();
+        Person author = entity.getAuthor();
+        Location location = author.getLocation();
+        entity.setDiscipline(getDisciplineIfExists(discipline));
+        entity.setCoordinates(getCoordinatesIfExists(coordinates));
+        author.setLocation(getLocationIfExists(location));
+        entity.setAuthor(getAuthorIfExists(author));
+    }
+
+    private Discipline getDisciplineIfExists(Discipline entity) {
+        if (entity.getId() != null) {
+            return disciplineRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
+        }
+        Optional<Discipline> existing = disciplineRepository.getIfExists(entity);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        return entity;
+    }
+
+    private Coordinates getCoordinatesIfExists(Coordinates entity) {
+        if (entity.getId() != null) {
+            return coordinatesRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
+        }
+        Optional<Coordinates> existing = coordinatesRepository.getIfExists(entity);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        return entity;
+    }
+
+    private Person getAuthorIfExists(Person entity) {
+        if (entity.getId() != null) {
+            return personRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
+        }
+        Optional<Person> existing = personRepository.getIfExists(entity);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        return entity;
+    }
+
+    private Location getLocationIfExists(Location entity) {
+        if (entity.getId() != null) {
+            return locationRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
+        }
+        Optional<Location> existing = locationRepository.getIfExists(entity);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        return entity;
     }
 }
