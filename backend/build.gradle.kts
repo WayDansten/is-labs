@@ -30,6 +30,11 @@ dependencies {
     
     testCompileOnly("org.projectlombok:lombok:1.18.40")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.40")
+
+    implementation("com.zaxxer:HikariCP:7.0.2")
+    implementation("org.eclipse.microprofile.config:microprofile-config-api:3.1")
+
+    implementation("io.minio:minio:8.5.2")
 }
 
 tasks.war {
