@@ -285,7 +285,7 @@ async function refreshUploads() {
 /* Panel styles and arrangement */
 
 #bgPanel {
-  background-image: url('src/assets/BG2.jpg');
+  background-image: url('src/assets/BG.jpg');
   background-size: cover;
   background-repeat: no-repeat;
 

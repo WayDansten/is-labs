@@ -1,6 +1,6 @@
 package exception;
 
-import dto.misc.StringResponseDTO;
+import dto.string.StringResponseDTO;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;

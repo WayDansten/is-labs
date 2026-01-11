@@ -1,4 +1,4 @@
-package dto.misc;
+package dto.upload;
 
 import java.io.Serializable;
 

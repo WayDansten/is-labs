@@ -1,14 +1,19 @@
 package service;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+
 import dto.labwork.LabWorkRequestDTO;
 import dto.labwork.LabWorkResponseDTO;
 import dto.misc.DifficultyRequestDTO;
+import dto.upload.UploadRequestDTO;
 import entity.Coordinates;
 import entity.Discipline;
 import entity.LabWork;
@@ -18,12 +23,14 @@ import entity.Upload;
 import entity.types.Difficulty;
 import event.EventPublisher;
 import exception.DifficultyException;
+import exception.FileImportException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.NoArgsConstructor;
 import mapper.LabWorkMapper;
+import parser.JsonLabWorkParser;
 import repository.LabWorkRepository;
 import repository.DisciplineRepository;
 import repository.CoordinatesRepository;
@@ -43,6 +50,7 @@ public class LabWorkService {
     private UploadService uploadService;
     private ChangeTrackerService trackerService;
     private EventPublisher eventPublisher;
+    private JsonLabWorkParser parser;
 
     @Inject
     public LabWorkService(
@@ -50,7 +58,7 @@ public class LabWorkService {
             DisciplineRepository disciplineRepository, CoordinatesRepository coordinatesRepository,
             PersonRepository personRepository, LocationRepository locationRepository,
             UploadService uploadService, ChangeTrackerService trackerService,
-            EventPublisher eventPublisher) {
+            EventPublisher eventPublisher, JsonLabWorkParser parser) {
         this.mapper = mapper;
         this.labWorkRepository = labWorkRepository;
         this.disciplineRepository = disciplineRepository;
@@ -60,6 +68,7 @@ public class LabWorkService {
         this.uploadService = uploadService;
         this.trackerService = trackerService;
         this.eventPublisher = eventPublisher;
+        this.parser = parser;
     }
 
     @Transactional
@@ -72,8 +81,16 @@ public class LabWorkService {
     }
 
     @Transactional
-    public void addBatch(List<LabWorkRequestDTO> dtos) {
-        Upload upload = uploadService.add();
+    public void addBatch(MultipartFormDataInput input) {
+        UploadRequestDTO uploadDTO = uploadService.from(input);
+        byte[] labworksAsBytes;
+        try {
+            labworksAsBytes = uploadDTO.getFileStream().readAllBytes();
+        } catch (IOException e) {
+            throw new FileImportException();
+        }
+        List<LabWorkRequestDTO> dtos = parser.parse(new ByteArrayInputStream(labworksAsBytes));
+        Upload upload = uploadService.add(uploadDTO.getFileName(), labworksAsBytes);
         try {
             for (LabWorkRequestDTO dto : dtos) {
                 add(dto);

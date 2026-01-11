@@ -1,5 +1,8 @@
 package entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +19,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "disciplines")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Discipline {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

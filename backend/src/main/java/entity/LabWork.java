@@ -2,6 +2,9 @@ package entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,6 +29,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "labworks")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class LabWork {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,6 +3,8 @@ package controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.DELETE;
@@ -18,8 +20,8 @@ import dto.labwork.LabWorkRequestDTO;
 import dto.labwork.LabWorkResponseDTO;
 import dto.misc.DifficultyRequestDTO;
 import dto.misc.LongResponseDTO;
-import dto.misc.StringRequestDTO;
-import dto.misc.StringResponseDTO;
+import dto.string.StringRequestDTO;
+import dto.string.StringResponseDTO;
 import jakarta.inject.Inject;
 import service.LabWorkService;
 import util.MessageConstants;
@@ -46,8 +48,10 @@ public class LabWorkController {
     
     @POST
     @Path("/batch")
-    public Response addBatch(List<LabWorkRequestDTO> dtos) {
-        service.addBatch(dtos);
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addBatch(MultipartFormDataInput input) {
+        service.addBatch(input);
         return Response.status(Response.Status.CREATED).entity(new StringResponseDTO(MessageConstants.OK.getMessage()))
                 .build();
     }

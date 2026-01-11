@@ -1,6 +1,6 @@
 package mapper;
 
-import dto.misc.UploadResponseDTO;
+import dto.upload.UploadResponseDTO;
 import entity.Upload;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.NoArgsConstructor;

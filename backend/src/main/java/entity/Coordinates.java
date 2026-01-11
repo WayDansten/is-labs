@@ -1,5 +1,6 @@
 package entity;
 
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,11 +12,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "coordinates")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Coordinates {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

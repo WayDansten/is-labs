@@ -1,6 +1,4 @@
-package dto.misc;
-
-import java.io.Serializable;
+package dto.download;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StringResponseDTO implements Serializable {
-    private String string;
+public class DownloadResponseDTO {
+    private String fileName;
+
+    private byte[] content;
 }

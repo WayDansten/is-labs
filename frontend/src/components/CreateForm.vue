@@ -381,18 +381,25 @@ async function createEntry(entry = null) {
   }
 }
 
-async function createBatch(entries) {
-  const body = entries
+async function createBatch(file) {
+  const formData = new FormData()
+  formData.append('file', file)
   const response = await fetch('http://localhost:8080/lab1/api/labwork/batch', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
+    body: formData,
   })
   const data = await response.json()
 
   bakeToast(data.string, response.ok)
+}
+
+async function downloadFile(id) {
+  const link = document.createElement('a')
+  link.href = `http://localhost:8080/lab1/api/upload/${id}`
+  link.target = '_self'
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
 }
 
 const resolveDiscipline = (entry) => {
@@ -454,7 +461,7 @@ const onFileSelect = async (event) => {
       }
 
       if (valid) {
-        createBatch(entries)
+        createBatch(file)
       }
     }
   } catch {
@@ -549,6 +556,17 @@ const onFileSelect = async (event) => {
               <Column field="id" header="ID"></Column>
               <Column field="status" header="Status"></Column>
               <Column field="objectsAdded" header="Objects added"></Column>
+              <Column header="Download">
+                <template #body="slotProps">
+                  <Button
+                    class="round-button"
+                    icon="pi pi-download"
+                    size="small"
+                    rounded
+                    @click="downloadFile(slotProps.data.id)"
+                  />
+                </template>
+              </Column>
             </DataTable>
           </div>
         </div>
@@ -840,5 +858,23 @@ const onFileSelect = async (event) => {
 
 :deep(.p-step-title) {
   font-family: 'Tektur', sans-serif !important;
+}
+
+.round-button {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  width: 2rem;
+  height: 2rem;
+}
+
+.round-button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.round-button:active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 1) !important;
 }
 </style>

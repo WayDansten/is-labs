@@ -1,4 +1,4 @@
-package dto.misc;
+package dto.string;
 
 import java.io.Serializable;
 
