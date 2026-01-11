@@ -41,35 +41,26 @@ import websocket.WebSocketMessageType;
 @ApplicationScoped
 @NoArgsConstructor
 public class LabWorkService {
-    private LabWorkMapper mapper;
-    private LabWorkRepository labWorkRepository;
-    private DisciplineRepository disciplineRepository;
-    private CoordinatesRepository coordinatesRepository;
-    private PersonRepository personRepository;
-    private LocationRepository locationRepository;
-    private UploadService uploadService;
-    private ChangeTrackerService trackerService;
-    private EventPublisher eventPublisher;
-    private JsonLabWorkParser parser;
-
     @Inject
-    public LabWorkService(
-            LabWorkMapper mapper, LabWorkRepository labWorkRepository,
-            DisciplineRepository disciplineRepository, CoordinatesRepository coordinatesRepository,
-            PersonRepository personRepository, LocationRepository locationRepository,
-            UploadService uploadService, ChangeTrackerService trackerService,
-            EventPublisher eventPublisher, JsonLabWorkParser parser) {
-        this.mapper = mapper;
-        this.labWorkRepository = labWorkRepository;
-        this.disciplineRepository = disciplineRepository;
-        this.coordinatesRepository = coordinatesRepository;
-        this.personRepository = personRepository;
-        this.locationRepository = locationRepository;
-        this.uploadService = uploadService;
-        this.trackerService = trackerService;
-        this.eventPublisher = eventPublisher;
-        this.parser = parser;
-    }
+    private LabWorkMapper mapper;
+    @Inject
+    private LabWorkRepository labWorkRepository;
+    @Inject
+    private DisciplineRepository disciplineRepository;
+    @Inject
+    private CoordinatesRepository coordinatesRepository;
+    @Inject
+    private PersonRepository personRepository;
+    @Inject
+    private LocationRepository locationRepository;
+    @Inject
+    private UploadService uploadService;
+    @Inject
+    private ChangeTrackerService trackerService;
+    @Inject
+    private EventPublisher eventPublisher;
+    @Inject
+    private JsonLabWorkParser parser;
 
     @Transactional
     public void add(LabWorkRequestDTO dto) {

@@ -1,9 +1,12 @@
 package config;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -20,18 +23,33 @@ public class WrappedDataSource implements DataSource {
     public WrappedDataSource() {
  
         HikariConfig hc = new HikariConfig();
+        Properties props = loadProperties();
 
-        hc.setJdbcUrl("jdbc:postgresql://localhost:5432/postgres");
-        hc.setUsername("postgres");
-        hc.setPassword("12345");
-        hc.setDriverClassName("org.postgresql.Driver");
-
-        hc.setMinimumIdle(5);  
-        hc.setMaximumPoolSize(20);
-        hc.setConnectionTimeout(30000);
-        hc.setIdleTimeout(600000);
+        hc.setJdbcUrl(props.getProperty("hikari.jdbc.url"));
+        hc.setUsername(props.getProperty("hikari.jdbc.username"));
+        hc.setPassword(props.getProperty("hikari.jdbc.password"));
+        hc.setDriverClassName(props.getProperty("hikari.jdbc.driver"));
+        
+        hc.setMinimumIdle(Integer.parseInt(props.getProperty("hikari.pool.minimumIdle")));
+        hc.setMaximumPoolSize(Integer.parseInt(props.getProperty("hikari.pool.maximumPoolSize")));
+        hc.setConnectionTimeout(Long.parseLong(props.getProperty("hikari.pool.connectionTimeout")));
+        hc.setIdleTimeout(Long.parseLong(props.getProperty("hikari.pool.idleTimeout")));
  
         hikariDataSource = new HikariDataSource(hc);
+    }
+    
+    private Properties loadProperties() {
+        Properties props = new Properties();
+        try (InputStream input = getClass().getClassLoader()
+                .getResourceAsStream("hikari.properties")) {
+            if (input == null) {
+                throw new RuntimeException("Unable to find hikari.properties");
+            }
+            props.load(input);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load properties", e);
+        }
+        return props;
     }
  
     @Override

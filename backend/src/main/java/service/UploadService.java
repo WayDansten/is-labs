@@ -28,16 +28,12 @@ import util.ImportFileFormat;
 @ApplicationScoped
 @NoArgsConstructor
 public class UploadService {
-    private UploadMapper mapper;
-    private UploadRepository repository;
-    private MinIOService minIOService;
-
     @Inject
-    public UploadService(UploadMapper mapper, UploadRepository repository, MinIOService minIOService) {
-        this.mapper = mapper;
-        this.repository = repository;
-        this.minIOService = minIOService;
-    }
+    private UploadMapper mapper;
+    @Inject
+    private UploadRepository repository;
+    @Inject
+    private MinIOService minIOService;
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public Upload add(String fileName, byte[] content) {
