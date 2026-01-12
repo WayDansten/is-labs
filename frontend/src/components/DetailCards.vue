@@ -316,6 +316,7 @@ const validateAuthor = () => {
       <template v-else-if="selectedLabWork">
         <div class="card-details">
           <strong>Coordinates: </strong>
+          <span>ID: {{ selectedLabWork.coordinates?.id }}</span>
           <span>X: {{ selectedLabWork.coordinates?.x }}</span>
           <span>Y: {{ selectedLabWork.coordinates?.y }}</span>
         </div>

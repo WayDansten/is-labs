@@ -58,8 +58,10 @@ const difficulties = ['VERY_EASY', 'NORMAL', 'INSANE', 'IMPOSSIBLE']
 const labWorks = ref([])
 const coordinates = ref([])
 const disciplines = ref([])
-const people = ref([])
+const authors = ref([])
 const locations = ref([])
+
+const uploads = ref([])
 
 const selectedLabWork = ref(null)
 
@@ -123,8 +125,9 @@ socket.onopen = () => {
   refreshLabWorks()
   refreshCoordinates()
   refreshDisciplines()
-  refreshPeople()
+  refreshAuthors()
   refreshLocations()
+  refreshUploads()
 }
 
 socket.onmessage = (event) => {
@@ -132,7 +135,6 @@ socket.onmessage = (event) => {
   switch (data.type) {
     case 'LABWORK':
       refreshLabWorks()
-      console.log(labWorks.value)
       break
     case 'COORDINATES':
       refreshCoordinates()
@@ -141,10 +143,13 @@ socket.onmessage = (event) => {
       refreshDisciplines()
       break
     case 'PERSON':
-      refreshPeople()
+      refreshAuthors()
       break
     case 'LOCATION':
       refreshLocations()
+      break
+    case 'UPLOAD':
+      refreshUploads()
       break
     default:
       break
@@ -169,16 +174,22 @@ async function refreshDisciplines() {
   disciplines.value = data
 }
 
-async function refreshPeople() {
+async function refreshAuthors() {
   const response = await fetch('http://localhost:8080/lab1/api/person')
   const data = await response.json()
-  people.value = data
+  authors.value = data
 }
 
 async function refreshLocations() {
   const response = await fetch('http://localhost:8080/lab1/api/location')
   const data = await response.json()
   locations.value = data
+}
+
+async function refreshUploads() {
+  const response = await fetch('http://localhost:8080/lab1/api/upload')
+  const data = await response.json()
+  uploads.value = data
 }
 </script>
 
@@ -258,8 +269,9 @@ async function refreshLocations() {
         <CreateForm
           :coordinates="coordinates"
           :disciplines="disciplines"
-          :people="people"
+          :authors="authors"
           :locations="locations"
+          :uploads="uploads"
           @close-form="toggleCreateForm"
         />
       </Dialog>
@@ -273,7 +285,7 @@ async function refreshLocations() {
 /* Panel styles and arrangement */
 
 #bgPanel {
-  background-image: url('src/assets/BG2.jpg');
+  background-image: url('src/assets/BG.jpg');
   background-size: cover;
   background-repeat: no-repeat;
 

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2" 
+             xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+                                 http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+    
+    <persistence-unit name="persistence-unit" transaction-type="JTA">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <jta-data-source>java:jboss/datasources/PostgreSQLDS</jta-data-source>
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+
+        <class>entity.Coordinates</class>
+        <class>entity.Discipline</class>
+        <class>entity.LabWork</class>
+        <class>entity.Location</class>
+        <class>entity.Person</class>
+        <class>entity.Upload</class>
+        
+        <properties>
+            <property name="wildfly.jpa.regionfactory" value="false" />
+            
+            <property name="jakarta.persistence.schema-generation.database.action" value="none"/>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+
+            <property name="hibernate.cache.use_second_level_cache" value="true" />
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.javax.cache.missing_cache_strategy" value="create"/>
+
+            <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.jcache.JCacheRegionFactory" />
+            <property name="hibernate.javax.cache.provider" value="org.ehcache.jsr107.EhcacheCachingProvider" />
+            
+            <property name="hibernate.cache.infinispan.statistics" value="false"/>
+            
+        </properties>
+    </persistence-unit>
+</persistence>

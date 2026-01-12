@@ -1,0 +1,46 @@
+[
+  {
+    "name": "A&DS 2",
+    "description": 1984,
+    "difficulty": "IMPOSSIBLE",
+    "minimalPoint": 5,
+    "averagePoint": -1000,
+    "coordinates": {
+      "x": 233,
+      "y": 20.3
+    },
+    "authorName": "WayTungsten",
+    "discipline": {
+      "name": "Algorithms & Data Structures",
+      "practiceHours": 120
+    }
+  },
+  {
+    "name": "CGA 3",
+    "description": "Generating illumination",
+    "difficulty": "IMPOSSIBLE",
+    "minimalPoint": 7,
+    "averagePoint": 9.2,
+    "coordinates": {
+      "x": 15.2,
+      "y": 25.8
+    },
+    "author": {
+      "name": "Ivan Ivanov",
+      "eyeColor": "GREEN",
+      "hairColor": "BLACK",
+      "birthday": "2025-10-26T22:43:49.54",
+      "nationality": "RUSSIA",
+      "location": {
+        "name": "Los-Angeles",
+        "x": 40,
+        "y": -74.006,
+        "z": 10.345
+      }
+    },
+    "discipline": {
+      "name": "Computer Graphics Algorithms",
+      "practiceHours": 90
+    }
+  }
+]

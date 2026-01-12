@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.ehcache.org/v3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.ehcache.org/v3
+            http://www.ehcache.org/schema/ehcache-core-3.0.xsd">
+
+    <persistence directory="java.io.tmpdir/ehcache"/>
+    
+    <cache-template name="entity-cache-template">
+        <key-type>java.lang.Object</key-type>
+        <value-type>java.lang.Object</value-type>
+        <expiry>
+            <ttl unit="minutes">30</ttl>
+        </expiry>
+        <heap unit="entries">1000</heap>
+        <disk unit="MB" persistent="true">100</disk>
+    </cache-template>
+
+    <cache alias="default-query-results-region" uses-template="entity-cache-template">
+        <heap unit="entries">500</heap>
+    </cache>
+
+    <cache alias="default-update-timestamps-region" uses-template="entity-cache-template">
+        <heap unit="entries">100</heap>
+    </cache>
+    
+    <cache alias="entity.LabWork" uses-template="entity-cache-template"/>
+    <cache alias="entity.Person" uses-template="entity-cache-template"/>
+    <cache alias="entity.Discipline" uses-template="entity-cache-template"/>
+    <cache alias="entity.Coordinates" uses-template="entity-cache-template"/>
+    <cache alias="entity.Location" uses-template="entity-cache-template"/>
+    <cache alias="entity.Upload" uses-template="entity-cache-template"/>
+
+</config>

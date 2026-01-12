@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.3">
+    <deployment>
+        <dependencies>
+            <module name="jdk.unsupported"/>
+            
+            <module name="org.ehcache" services="import"/>
+            <module name="javax.cache.api" services="import"/>
+            <module name="org.hibernate.jcache" services="import"/>
+            
+            <module name="org.hibernate" services="import"/>
+            <module name="org.hibernate.validator" services="import"/>
+            
+            <module name="javax.api"/>
+            <module name="javax.persistence.api"/>
+            <module name="javax.transaction.api"/>
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>
