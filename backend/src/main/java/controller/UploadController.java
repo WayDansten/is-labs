@@ -41,7 +41,7 @@ public class UploadController {
         DownloadResponseDTO dto = service.download(id);
         return Response.ok(new ByteArrayInputStream(dto.getContent()))
                 .type(MediaType.APPLICATION_OCTET_STREAM)
-                .header("Content-Disposition", "attachment; filename=\"" + dto.getFileName() + "\"")
+                .header("Content-Disposition", String.format("attachment; filename=\"%s\"", dto.getFileName()))
                 .header("Content-Length", dto.getContent().length)
                 .build();
     }

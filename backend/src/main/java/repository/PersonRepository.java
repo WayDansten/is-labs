@@ -17,7 +17,7 @@ public class PersonRepository extends AbstractRepository<Person, Integer> {
         super(Person.class);
     }
 
-    public Optional<Person> getIfExists(Person entity) {
+    public Optional<Person> get(Person entity) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Person> cq = cb.createQuery(Person.class);
         Root<Person> root = cq.from(Person.class);

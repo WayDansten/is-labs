@@ -2,14 +2,14 @@ package parser.raw;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Value;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@Value
 @AllArgsConstructor
 public class RawDiscipline {
     private String name;
-    private Integer practiceHours;
+    private int practiceHours;
 }

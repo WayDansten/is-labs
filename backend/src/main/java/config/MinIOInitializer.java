@@ -42,7 +42,7 @@ public class MinIOInitializer {
                 log.info("Bucket '{}' already exists", bucketName);
             }
         } catch (Exception e) {
-            log.error("Error while initializing MinIO bucket '{}'", bucketName, e);
+            throw new RuntimeException(String.format("Error while initializing MinIO bucket '%s'", bucketName));
         }
     }
 

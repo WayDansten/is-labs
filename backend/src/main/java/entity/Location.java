@@ -1,5 +1,6 @@
 package entity;
 
+import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import jakarta.persistence.Cacheable;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "locations")
 @Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

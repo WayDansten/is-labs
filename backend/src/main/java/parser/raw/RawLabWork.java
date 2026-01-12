@@ -3,13 +3,13 @@ package parser.raw;
 import entity.types.Difficulty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Value;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@Value
 public class RawLabWork {
     private String name;
     private RawCoordinates coordinates;

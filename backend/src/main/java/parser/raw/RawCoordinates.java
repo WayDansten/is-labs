@@ -2,16 +2,16 @@ package parser.raw;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Value;
 
 import java.io.Serializable;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@Value
 @AllArgsConstructor
 public class RawCoordinates implements Serializable {
-    private Float x;
-    private Double y;
+    private float x;
+    private double y;
 }

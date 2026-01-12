@@ -17,7 +17,7 @@ public class LocationRepository extends AbstractRepository<Location, Integer> {
         super(Location.class);
     }
 
-    public Optional<Location> getIfExists(Location entity) {
+    public Optional<Location> get(Location entity) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Location> cq = cb.createQuery(Location.class);
         Root<Location> root = cq.from(Location.class);

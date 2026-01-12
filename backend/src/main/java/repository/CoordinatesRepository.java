@@ -17,7 +17,7 @@ public class CoordinatesRepository extends AbstractRepository<Coordinates, Integ
         super(Coordinates.class);
     }
 
-    public Optional<Coordinates> getIfExists(Coordinates entity) {
+    public Optional<Coordinates> get(Coordinates entity) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Coordinates> cq = cb.createQuery(Coordinates.class);
         Root<Coordinates> root = cq.from(Coordinates.class);

@@ -12,21 +12,14 @@ import repository.LabWorkRepository;
 @ApplicationScoped
 @NoArgsConstructor
 public class LabWorkMapper {
-    private LabWorkRepository repository;
-    private PersonMapper personMapper;
-    private DisciplineMapper disciplineMapper;
-    private CoordinatesMapper coordinatesMapper;
-
     @Inject
-    public LabWorkMapper(
-        LabWorkRepository repository, PersonMapper personMapper,
-        DisciplineMapper disciplineMapper, CoordinatesMapper coordinatesMapper
-    ) {
-        this.repository = repository;
-        this.personMapper = personMapper;
-        this.disciplineMapper = disciplineMapper;
-        this.coordinatesMapper = coordinatesMapper;
-    }
+    private LabWorkRepository repository;
+    @Inject
+    private PersonMapper personMapper;
+    @Inject
+    private DisciplineMapper disciplineMapper;
+    @Inject
+    private CoordinatesMapper coordinatesMapper;
 
     public LabWorkResponseDTO toDTO(LabWork entity) {
         return new LabWorkResponseDTO(

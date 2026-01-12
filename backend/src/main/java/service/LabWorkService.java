@@ -2,13 +2,10 @@ package service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import dto.labwork.LabWorkRequestDTO;
 import dto.labwork.LabWorkResponseDTO;
@@ -72,13 +69,12 @@ public class LabWorkService {
     }
 
     @Transactional
-    public void addBatch(MultipartFormDataInput input) {
-        UploadRequestDTO uploadDTO = uploadService.from(input);
+    public void addBatch(UploadRequestDTO uploadDTO) {
         byte[] labworksAsBytes;
         try {
             labworksAsBytes = uploadDTO.getFileStream().readAllBytes();
         } catch (IOException e) {
-            throw new FileImportException();
+            throw new FileImportException(e);
         }
         List<LabWorkRequestDTO> dtos = parser.parse(new ByteArrayInputStream(labworksAsBytes));
         Upload upload = uploadService.add(uploadDTO.getFileName(), labworksAsBytes);
@@ -88,9 +84,7 @@ public class LabWorkService {
             }
             uploadService.setUploadSuccess(upload.getId(), dtos.size());
         } finally {
-            Set<WebSocketMessageType> changedTypes = new HashSet<>();
-            changedTypes.add(WebSocketMessageType.UPLOAD);
-            eventPublisher.fireEvent(changedTypes);
+            eventPublisher.fireEvent(Set.of(WebSocketMessageType.UPLOAD));
         }
     }
 
@@ -107,8 +101,6 @@ public class LabWorkService {
     public void lowerDifficulty(DifficultyRequestDTO dto) {
         Integer id = dto.getId();
         Integer steps = dto.getSteps();
-        Set<WebSocketMessageType> changedTypes = new HashSet<>();
-        changedTypes.add(WebSocketMessageType.LABWORK);
         LabWork entity = labWorkRepository.getByKey(id).orElseThrow(EntityNotFoundException::new);
         if (entity.getDifficulty().getValue() - steps <= 0) {
             throw new DifficultyException();
@@ -116,32 +108,31 @@ public class LabWorkService {
         Difficulty newDifficulty = Difficulty.getByValue(entity.getDifficulty().getValue() - steps);
         entity.setDifficulty(newDifficulty);
         labWorkRepository.update(entity);
-        eventPublisher.fireEvent(changedTypes);
+        eventPublisher.fireEvent(Set.of(WebSocketMessageType.LABWORK));
     }
 
     @Transactional
     public void delete(Integer id) {
-        Set<WebSocketMessageType> changedTypes = new HashSet<>();
-        changedTypes.add(WebSocketMessageType.LABWORK);
         labWorkRepository.deleteByKey(id);
-        eventPublisher.fireEvent(changedTypes);
+        eventPublisher.fireEvent(Set.of(WebSocketMessageType.LABWORK));
     }
 
     @Transactional
     public void deleteByAuthor(String author) {
-        Set<WebSocketMessageType> changedTypes = new HashSet<>();
-        changedTypes.add(WebSocketMessageType.LABWORK);
         List<LabWork> labWorks = labWorkRepository.getByAuthor(author);
         if (labWorks.isEmpty()) {
             throw new EntityNotFoundException();
         }
         labWorkRepository.delete(labWorks.get(0));
-        eventPublisher.fireEvent(changedTypes);
+        eventPublisher.fireEvent(Set.of(WebSocketMessageType.LABWORK));
     }
 
     @Transactional
     public List<LabWorkResponseDTO> getAll() {
-        return labWorkRepository.getAll().stream().filter(Objects::nonNull).map(mapper::toDTO).toList();
+        return labWorkRepository.getAll().stream()
+        .filter(Objects::nonNull)
+        .map(mapper::toDTO)
+        .toList();
     }
 
     @Transactional
@@ -155,21 +146,17 @@ public class LabWorkService {
     }
 
     private void setExistingFields(LabWork entity) {
-        Discipline discipline = entity.getDiscipline();
-        Coordinates coordinates = entity.getCoordinates();
-        Person author = entity.getAuthor();
-        Location location = author.getLocation();
-        entity.setDiscipline(getDisciplineIfExists(discipline));
-        entity.setCoordinates(getCoordinatesIfExists(coordinates));
-        author.setLocation(getLocationIfExists(location));
-        entity.setAuthor(getAuthorIfExists(author));
+        entity.setDiscipline(getDisciplineIfExists(entity.getDiscipline()));
+        entity.setCoordinates(getCoordinatesIfExists(entity.getCoordinates()));
+        entity.getAuthor().setLocation(getLocationIfExists(entity.getAuthor().getLocation()));
+        entity.setAuthor(getAuthorIfExists(entity.getAuthor()));
     }
 
     private Discipline getDisciplineIfExists(Discipline entity) {
         if (entity.getId() != null) {
             return disciplineRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
         }
-        Optional<Discipline> existing = disciplineRepository.getIfExists(entity);
+        Optional<Discipline> existing = disciplineRepository.get(entity);
         if (existing.isPresent()) {
             return existing.get();
         }
@@ -180,7 +167,7 @@ public class LabWorkService {
         if (entity.getId() != null) {
             return coordinatesRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
         }
-        Optional<Coordinates> existing = coordinatesRepository.getIfExists(entity);
+        Optional<Coordinates> existing = coordinatesRepository.get(entity);
         if (existing.isPresent()) {
             return existing.get();
         }
@@ -191,7 +178,7 @@ public class LabWorkService {
         if (entity.getId() != null) {
             return personRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
         }
-        Optional<Person> existing = personRepository.getIfExists(entity);
+        Optional<Person> existing = personRepository.get(entity);
         if (existing.isPresent()) {
             return existing.get();
         }
@@ -202,7 +189,7 @@ public class LabWorkService {
         if (entity.getId() != null) {
             return locationRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
         }
-        Optional<Location> existing = locationRepository.getIfExists(entity);
+        Optional<Location> existing = locationRepository.get(entity);
         if (existing.isPresent()) {
             return existing.get();
         }

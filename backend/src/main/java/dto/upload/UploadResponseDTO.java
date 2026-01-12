@@ -12,10 +12,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadResponseDTO implements Serializable{
-    private Integer id;
+    private int id;
 
-    private Boolean status;
+    private boolean status;
 
-    private Integer objectsAdded;
+    private int objectsAdded;
 }
 

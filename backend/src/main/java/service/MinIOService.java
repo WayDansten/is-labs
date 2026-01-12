@@ -8,9 +8,11 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MediaType;
 
 @ApplicationScoped
 public class MinIOService {
+    private static final long PART_SIZE = 10 * 1024 * (long) 1024;
 
     @Inject
     private MinIOConfig config;
@@ -23,8 +25,8 @@ public class MinIOService {
                 PutObjectArgs.builder()
                         .bucket("files")
                         .object(objectKey)
-                        .stream(new ByteArrayInputStream(content), -1, 10 * 1024 * 1024)
-                        .contentType("application/octet-stream")
+                        .stream(new ByteArrayInputStream(content), -1, PART_SIZE)
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
                         .build()
         );
     }
