@@ -23,7 +23,7 @@ public class MinIOService {
     public void save(String objectKey, byte[] content) throws Exception {
         client.putObject(
                 PutObjectArgs.builder()
-                        .bucket("files")
+                        .bucket(config.getImportsBucket())
                         .object(objectKey)
                         .stream(new ByteArrayInputStream(content), -1, PART_SIZE)
                         .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -34,7 +34,7 @@ public class MinIOService {
     public byte[] get(String objectKey) throws Exception {
         return client.getObject(
                 GetObjectArgs.builder()
-                        .bucket("files")
+                        .bucket(config.getImportsBucket())
                         .object(objectKey)
                         .build()
         ).readAllBytes();

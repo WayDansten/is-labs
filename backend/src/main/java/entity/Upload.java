@@ -37,5 +37,5 @@ public class Upload {
     private Boolean status;
 
     @Column(name = "objects_added")
-    private Integer objectsAdded;
+    private Integer addedObjectsCount;
 }

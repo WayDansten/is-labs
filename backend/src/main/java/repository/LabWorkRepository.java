@@ -1,11 +1,13 @@
 package repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import entity.LabWork;
 import entity.Person;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -54,5 +56,26 @@ public class LabWorkRepository extends AbstractRepository<LabWork, Integer> {
         cq.orderBy(cb.asc(root.get("name")));
 
         return em.createQuery(cq).getResultList();
+    }
+
+    @Override
+    public Optional<LabWork> get(LabWork entity) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<LabWork> cq = cb.createQuery(LabWork.class);
+        Root<LabWork> root = cq.from(LabWork.class);
+
+        cq.select(root).where(
+            cb.and(
+                cb.equal(root.get("name"), entity.getName()),
+                cb.equal(root.get("averagePoint"), entity.getAveragePoint()),
+                cb.equal(root.get("minimalPoint"), entity.getMinimalPoint()))
+        );
+
+        try {
+            LabWork labWork = em.createQuery(cq).getSingleResult();
+            return Optional.of(labWork);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 }

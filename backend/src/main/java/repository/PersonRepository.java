@@ -17,6 +17,7 @@ public class PersonRepository extends AbstractRepository<Person, Integer> {
         super(Person.class);
     }
 
+    @Override
     public Optional<Person> get(Person entity) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Person> cq = cb.createQuery(Person.class);

@@ -16,6 +16,6 @@ public class UploadResponseDTO implements Serializable{
 
     private boolean status;
 
-    private int objectsAdded;
+    private int addedObjectsCount;
 }
 

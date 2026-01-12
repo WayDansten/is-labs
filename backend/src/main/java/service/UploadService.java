@@ -41,10 +41,10 @@ public class UploadService {
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public void setUploadSuccess(int id, int objectsAdded) {
+    public void setUploadSuccess(int id, int addedObjectsCount) {
         Upload upload = repository.getByKey(id).orElseThrow(EntityNotFoundException::new);
         upload.setStatus(true);
-        upload.setObjectsAdded(objectsAdded);
+        upload.setAddedObjectsCount(addedObjectsCount);
         repository.update(upload);
     }
 

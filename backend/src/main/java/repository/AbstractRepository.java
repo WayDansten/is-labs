@@ -52,4 +52,6 @@ public abstract class AbstractRepository<T, K> {
         T entity = this.getByKey(key).orElseThrow(EntityNotFoundException::new);
         em.remove(entity);
     }
+
+    public abstract Optional<T> get(T entity);
 }

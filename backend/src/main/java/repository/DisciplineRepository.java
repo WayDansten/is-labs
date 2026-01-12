@@ -17,6 +17,7 @@ public class DisciplineRepository extends AbstractRepository<Discipline, Integer
         super(Discipline.class);
     }
 
+    @Override
     public Optional<Discipline> get(Discipline entity) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Discipline> cq = cb.createQuery(Discipline.class);

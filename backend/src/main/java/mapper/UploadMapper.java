@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UploadMapper {
     public UploadResponseDTO toDTO(Upload entity) {
-        return new UploadResponseDTO(entity.getId(), entity.getStatus(), entity.getObjectsAdded());
+        return new UploadResponseDTO(entity.getId(), entity.getStatus(), entity.getAddedObjectsCount());
     }
 }

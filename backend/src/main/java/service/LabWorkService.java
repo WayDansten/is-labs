@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import dto.labwork.LabWorkRequestDTO;
 import dto.labwork.LabWorkResponseDTO;
@@ -30,6 +31,7 @@ import mapper.LabWorkMapper;
 import parser.JsonLabWorkParser;
 import repository.LabWorkRepository;
 import repository.DisciplineRepository;
+import repository.AbstractRepository;
 import repository.CoordinatesRepository;
 import repository.PersonRepository;
 import repository.LocationRepository;
@@ -103,7 +105,7 @@ public class LabWorkService {
         Integer steps = dto.getSteps();
         LabWork entity = labWorkRepository.getByKey(id).orElseThrow(EntityNotFoundException::new);
         if (entity.getDifficulty().getValue() - steps <= 0) {
-            throw new DifficultyException();
+            throw new DifficultyException("Non-existent difficulty value");
         }
         Difficulty newDifficulty = Difficulty.getByValue(entity.getDifficulty().getValue() - steps);
         entity.setDifficulty(newDifficulty);
@@ -146,50 +148,18 @@ public class LabWorkService {
     }
 
     private void setExistingFields(LabWork entity) {
-        entity.setDiscipline(getDisciplineIfExists(entity.getDiscipline()));
-        entity.setCoordinates(getCoordinatesIfExists(entity.getCoordinates()));
-        entity.getAuthor().setLocation(getLocationIfExists(entity.getAuthor().getLocation()));
-        entity.setAuthor(getAuthorIfExists(entity.getAuthor()));
+        entity.setDiscipline(getIfExists(disciplineRepository, entity.getDiscipline(), Discipline::getId));
+        entity.setCoordinates(getIfExists(coordinatesRepository, entity.getCoordinates(), Coordinates::getId));
+        entity.getAuthor().setLocation(getIfExists(locationRepository, entity.getAuthor().getLocation(), Location::getId));
+        entity.setAuthor(getIfExists(personRepository, entity.getAuthor(), Person::getId));
     }
 
-    private Discipline getDisciplineIfExists(Discipline entity) {
-        if (entity.getId() != null) {
-            return disciplineRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
+    private <T, K> T getIfExists(AbstractRepository<T,K> repository, T entity, Function<T,K> getID) {
+        K id = getID.apply(entity);
+        if (id != null) {
+            return repository.getByKey(id).orElseThrow(EntityNotFoundException::new);
         }
-        Optional<Discipline> existing = disciplineRepository.get(entity);
-        if (existing.isPresent()) {
-            return existing.get();
-        }
-        return entity;
-    }
-
-    private Coordinates getCoordinatesIfExists(Coordinates entity) {
-        if (entity.getId() != null) {
-            return coordinatesRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
-        }
-        Optional<Coordinates> existing = coordinatesRepository.get(entity);
-        if (existing.isPresent()) {
-            return existing.get();
-        }
-        return entity;
-    }
-
-    private Person getAuthorIfExists(Person entity) {
-        if (entity.getId() != null) {
-            return personRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
-        }
-        Optional<Person> existing = personRepository.get(entity);
-        if (existing.isPresent()) {
-            return existing.get();
-        }
-        return entity;
-    }
-
-    private Location getLocationIfExists(Location entity) {
-        if (entity.getId() != null) {
-            return locationRepository.getByKey(entity.getId()).orElseThrow(EntityNotFoundException::new);
-        }
-        Optional<Location> existing = locationRepository.get(entity);
+        Optional<T> existing = repository.get(entity);
         if (existing.isPresent()) {
             return existing.get();
         }
